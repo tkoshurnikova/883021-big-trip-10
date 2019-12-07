@@ -7,6 +7,8 @@ import {createSiteMenuTemplate} from './components/site-menu.js';
 import {createSortTemplate} from './components/sort.js';
 import {createTripInfoTemplate} from './components/trip-info.js';
 
+import {generateFilters} from './mock/filter.js';
+
 const CARDS_COUNT = 3;
 
 const render = (container, template, place) => {
@@ -16,7 +18,9 @@ const render = (container, template, place) => {
 const siteHeaderElement = document.querySelector(`.trip-main__trip-controls`);
 const siteHeaderFirstHeadingElement = siteHeaderElement.querySelector(`h2`);
 render(siteHeaderFirstHeadingElement, createSiteMenuTemplate(), `afterend`);
-render(siteHeaderElement, createFilterTemplate(), `beforeend`);
+
+const filters = generateFilters();
+render(siteHeaderElement, createFilterTemplate(filters), `beforeend`);
 
 const cardsListSection = document.querySelector(`.trip-events`);
 render(cardsListSection, createSortTemplate(), `beforeend`);
