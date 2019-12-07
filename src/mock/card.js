@@ -1,15 +1,15 @@
 const ICONS = [
-  `../../markup/img/icons/bus.png`,
-  `../../markup/img/icons/check-in.png`,
-  `../../markup/img/icons/drive.png`,
-  `../../markup/img/icons/flight.png`,
-  `../../markup/img/icons/restaurant.png`,
-  `../../markup/img/icons/ship.png`,
-  `../../markup/img/icons/sightseeing.png`,
-  `../../markup/img/icons/taxi.png`,
-  `../../markup/img/icons/train.png`,
-  `../../markup/img/icons/transport.png`,
-  `../../markup/img/icons/trip.png`
+  `img/icons/bus.png`,
+  `img/icons/check-in.png`,
+  `img/icons/drive.png`,
+  `img/icons/flight.png`,
+  `img/icons/restaurant.png`,
+  `img/icons/ship.png`,
+  `img/icons/sightseeing.png`,
+  `img/icons/taxi.png`,
+  `img/icons/train.png`,
+  `img/icons/transport.png`,
+  `img/icons/trip.png`
 ];
 
 const CITIES = [
@@ -67,12 +67,20 @@ const PRICE_MIN = 0;
 const PRICE_MAX = 1000;
 
 const getRandomArrayElement = (array) => {
-  const randomIndex = getRandomIntegerNumber(0, array.length);
+  const randomIndex = getRandomIntegerNumber(0, array.length - 1);
   return array[randomIndex];
 };
 
 const getRandomIntegerNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const getRandomArrayElements = (array, count) => {
+  const randomElemnets = [];
+  for (var i = 0; i < count; i++) {
+    randomElemnets.push(getRandomArrayElement(array));
+  }
+  return randomElemnets;
 };
 
 const generatePhoto = () => {
@@ -105,11 +113,11 @@ const generateCard = () => {
     icon: getRandomArrayElement(ICONS),
     city: getRandomArrayElement(CITIES),
     photos: generateArray(photosCount, generatePhoto),
-    description: generateArray(descriptionSentencesCount, getRandomArrayElement(DESCRIPTION)),
+    description: getRandomArrayElements(DESCRIPTION, descriptionSentencesCount),
     startDate: Math.min(startDate, endDate),
     endDate: Math.max(startDate, endDate),
     price: getRandomIntegerNumber(PRICE_MIN, PRICE_MAX),
-    options: generateArray(optionsCount, getRandomArrayElement(OPTIONS))
+    options: getRandomArrayElements(OPTIONS, optionsCount)
   };
 };
 
