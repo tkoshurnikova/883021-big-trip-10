@@ -1,15 +1,48 @@
-const ICONS = [
-  `img/icons/bus.png`,
-  `img/icons/check-in.png`,
-  `img/icons/drive.png`,
-  `img/icons/flight.png`,
-  `img/icons/restaurant.png`,
-  `img/icons/ship.png`,
-  `img/icons/sightseeing.png`,
-  `img/icons/taxi.png`,
-  `img/icons/train.png`,
-  `img/icons/transport.png`,
-  `img/icons/trip.png`
+const EVENTS = [
+  {
+    name: `Bus`,
+    icon: `img/icons/bus.png`
+  },
+  {
+    name: `Check-in`,
+    icon: `img/icons/check-in.png`
+  },
+  {
+    name: `Drive`,
+    icon: `img/icons/drive.png`
+  },
+    {
+    name: `Flight`,
+    icon: `img/icons/flight.png`
+  },
+    {
+    name: `Restaurant`,
+    icon: `img/icons/restaurant.png`
+  },
+    {
+    name: `Ship`,
+    icon: `img/icons/ship.png`
+  },
+    {
+    name: `Sightseeing`,
+    icon: `img/icons/sightseeing.png`
+  },
+    {
+    name: `Taxi`,
+    icon:`img/icons/taxi.png`
+  },
+    {
+    name: `Train`,
+    icon: `img/icons/train.png`
+  },
+    {
+    name: `Transport`,
+    icon: `img/icons/transport.png`
+  },
+    {
+    name: `Trip`,
+    icon:`img/icons/trip.png`
+  }
 ];
 
 const CITIES = [
@@ -76,11 +109,11 @@ const getRandomIntegerNumber = (min, max) => {
 };
 
 const getRandomArrayElements = (array, count) => {
-  const randomElemnets = [];
+  const randomElements = [];
   for (var i = 0; i < count; i++) {
-    randomElemnets.push(getRandomArrayElement(array));
+    randomElements.push(getRandomArrayElement(array));
   }
-  return randomElemnets;
+  return randomElements;
 };
 
 const generatePhoto = () => {
@@ -96,9 +129,14 @@ const generateArray = (count, element) => {
 const getRandomDate = () => {
   const targetDate = new Date();
   const sign = Math.random() > 0.5 ? 1 : -1;
-  const diffValue = sign * getRandomIntegerNumber(0, 31);
+  const diffDateValue = sign * getRandomIntegerNumber(0, 2);
+  const diffHoursValue = sign * getRandomIntegerNumber(0, 24);
+  const diffMinutesValue = sign * getRandomIntegerNumber(0, 60);
 
-  targetDate.setDate(targetDate.getDate() + diffValue);
+  targetDate.setDate(targetDate.getDate() + diffDateValue);
+  targetDate.setHours(targetDate.getHours() + diffHoursValue);
+  targetDate.setMinutes(targetDate.getMinutes() + diffMinutesValue);
+
   return targetDate;
 };
 
@@ -106,16 +144,14 @@ const generateCard = () => {
   const photosCount = getRandomIntegerNumber(PHOTO_COUNT_MIN, PHOTO_COUNT_MAX);
   const descriptionSentencesCount = getRandomIntegerNumber(SENTENCES_COUNT_MIN, SENTENCES_COUNT_MAX);
   const optionsCount = getRandomIntegerNumber(OPTIONS_COUNT_MIN, OPTIONS_COUNT_MAX);
-  const startDate = getRandomDate();
-  const endDate = getRandomDate();
 
   return {
-    icon: getRandomArrayElement(ICONS),
+    event: getRandomArrayElement(EVENTS),
     city: getRandomArrayElement(CITIES),
     photos: generateArray(photosCount, generatePhoto),
     description: getRandomArrayElements(DESCRIPTION, descriptionSentencesCount),
-    startDate: Math.min(startDate, endDate),
-    endDate: Math.max(startDate, endDate),
+    startDate: getRandomDate(),
+    endDate: getRandomDate(),
     price: getRandomIntegerNumber(PRICE_MIN, PRICE_MAX),
     options: getRandomArrayElements(OPTIONS, optionsCount)
   };

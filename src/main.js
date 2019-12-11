@@ -8,6 +8,7 @@ import {createSortTemplate} from './components/sort.js';
 import {createTripInfoTemplate} from './components/trip-info.js';
 
 import {generateFilters} from './mock/filter.js';
+import {generateCards} from './mock/card.js';
 
 const CARDS_COUNT = 3;
 
@@ -30,11 +31,9 @@ const cardsListElement = cardsListSection.querySelector(`.trip-days`);
 render(cardsListElement, createDayListTemplate(), `beforeend`);
 
 const dayListElement = cardsListElement.querySelector(`.trip-events__list`);
-new Array(CARDS_COUNT)
-  .fill(``)
-  .forEach(
-      () => render(dayListElement, createCardTemplate(), `beforeend`)
-  );
+
+const cards = generateCards(CARDS_COUNT);
+cards.slice(1).forEach((card) => render(dayListElement, createCardTemplate(card), `beforeend`));
 
 render(cardsListElement, createCardEditTemplate(), `beforebegin`);
 
