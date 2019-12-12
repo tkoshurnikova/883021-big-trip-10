@@ -1,4 +1,4 @@
-import {formatTime} from '../utils.js';
+import {formatTime, formatDateForDatetime} from '../utils.js';
 
 const createOffersMarkup = (offers) => {
   return offers
@@ -37,9 +37,9 @@ export const createCardTemplate = (card) => {
 
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${startDate}">${formatTime(startDate)}</time>
+            <time class="event__start-time" datetime="${formatDateForDatetime(startDate)}">${formatTime(startDate)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${endDate}">${formatTime(endDate)}</time>
+            <time class="event__end-time" datetime="${formatDateForDatetime(endDate)}">${formatTime(endDate)}</time>
           </p>
           <p class="event__duration">${eventDuration()}</p>
         </div>

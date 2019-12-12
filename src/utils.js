@@ -17,9 +17,14 @@ const formatDate = (date) => {
   return `${day}/${month}/${year}`;
 };
 
-const randomChecked = () => {
-  const check = (Math.random() > 0.5) ? `checked` : ``;
-  return check;
-}
+const formatDateForDatetime = (date) => {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
 
-export {formatTime, formatDate, randomChecked};
+  return `${year}-${month}-${day}`;
+};
+
+const MONTHS = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
+
+export {formatTime, formatDate, formatDateForDatetime, MONTHS};

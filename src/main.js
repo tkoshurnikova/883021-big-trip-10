@@ -1,5 +1,4 @@
 import {createCardEditTemplate} from './components/card-edit.js';
-import {createCardTemplate} from './components/card.js';
 import {createCardsListTemplate} from './components/cards-list.js';
 import {createDayListTemplate} from './components/day-list.js';
 import {createFilterTemplate} from './components/filter.js';
@@ -27,15 +26,12 @@ const cardsListSection = document.querySelector(`.trip-events`);
 render(cardsListSection, createSortTemplate(), `beforeend`);
 render(cardsListSection, createCardsListTemplate(), `beforeend`);
 
-const cardsListElement = cardsListSection.querySelector(`.trip-days`);
-render(cardsListElement, createDayListTemplate(), `beforeend`);
-
-const dayListElement = cardsListElement.querySelector(`.trip-events__list`);
-
 const cards = generateCards(CARDS_COUNT);
-cards.slice(1).forEach((card) => render(dayListElement, createCardTemplate(card), `beforeend`));
+
+const cardsListElement = cardsListSection.querySelector(`.trip-days`);
+render(cardsListElement, createDayListTemplate(cards), `beforeend`);
 
 render(cardsListElement, createCardEditTemplate(cards[0]), `beforebegin`);
 
 const tripInfoSection = document.querySelector(`.trip-main__trip-info`);
-render(tripInfoSection, createTripInfoTemplate(), `afterbegin`);
+render(tripInfoSection, createTripInfoTemplate(cards), `afterbegin`);

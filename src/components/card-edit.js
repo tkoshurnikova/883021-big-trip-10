@@ -1,5 +1,5 @@
 import {EVENTS, CITIES, OPTIONS} from '../mock/card.js';
-import {formatTime, formatDate, randomChecked} from '../utils.js';
+import {formatTime, formatDate} from '../utils.js';
 
 const createEventMarkup = (event) => {
   const {name} = event;
@@ -21,10 +21,12 @@ const createEventsMarkup = (group, events) => {
   );
 };
 
-const createOfferMarkup = (offer) => {
+const createOfferMarkup = (offer, card) => {
+  const {options} = card;
+  const check = (options.indexOf(offer) !== -1) ? `checked` : ``;
   return (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${randomChecked()}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${check}>
       <label class="event__offer-label" for="event-offer-${offer.type}-1">
         <span class="event__offer-title">${offer.name}</span>
         &plus;
@@ -35,10 +37,10 @@ const createOfferMarkup = (offer) => {
 };
 
 export const createCardEditTemplate = (card) => {
-  const {type, destination, photos, description, startDate, endDate, price, options} = card;
+  const {type, destination, photos, description, startDate, endDate, price} = card;
   const eventGroups = Array.from(new Set(EVENTS.map((event) => event.group)));
   const events = eventGroups.map((group) => createEventsMarkup(group, EVENTS)).join(`\n`);
-  const offers = OPTIONS.map((option) => createOfferMarkup(option)).join(`\n`);
+  const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
 
   return (
     `<form class="event  event--edit" action="#" method="post">
@@ -61,11 +63,11 @@ export const createCardEditTemplate = (card) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
           <datalist id="destination-list-1">
-            ${CITIES.map((city) => {
-              return (
-                `<option value="${city}"></option>`
-              );
-            }).join(`\n`)}
+    ${CITIES.map((city) => {
+      return (
+        `<option value="${city}"></option>`
+      );
+    }).join(`\n`)}
           </datalist>
         </div>
 
@@ -121,11 +123,11 @@ export const createCardEditTemplate = (card) => {
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
-            ${photos.map((photo) => {
-              return (
-                `<img class="event__photo" src="${photo}" alt="Event photo">`
-              );
-            }).join(`\n`)}
+    ${photos.map((photo) => {
+      return (
+        `<img class="event__photo" src="${photo}" alt="Event photo">`
+      );
+    }).join(`\n`)}
             </div>
           </div>
         </section>

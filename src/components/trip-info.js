@@ -1,8 +1,24 @@
-export const createTripInfoTemplate = () => {
+import {MONTHS} from '../utils.js';
+
+const getTripCost = (card) => {
+  const {price, options} = card;
+  const tripCost = options.map((option) => option.price).reduce((sum, current) => {
+    return sum + current;
+  }, price);
+  return tripCost;
+};
+
+export const createTripInfoTemplate = (cards) => {
+  const totalCost = cards.map((card) => getTripCost(card)).reduce((sum, current) => {
+    return sum + current;
+  });
   return (
     `<div class="trip-info__main">
-        <h1 class="trip-info__title">Amsterdam &mdash; ... &mdash; Amsterdam</h1>
-        <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;21</p>
-      </div>`
+      <h1 class="trip-info__title">${cards[0].destination} &mdash; ... &mdash; ${cards[cards.length - 1].destination}</h1>
+      <p class="trip-info__dates">${MONTHS[cards[0].startDate.getMonth()]} ${cards[0].startDate.getDate()}&nbsp;&mdash;&nbsp;${cards[cards.length - 1].endDate.getDate()}</p>
+    </div>
+    <p class="trip-info__cost">
+      Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalCost}</span>
+    </p>`
   );
 };
