@@ -1,48 +1,54 @@
 const EVENTS = [
   {
     name: `Bus`,
-    icon: `img/icons/bus.png`
+    icon: `img/icons/bus.png`,
+    group: `Tranfer`
   },
   {
     name: `Check-in`,
-    icon: `img/icons/check-in.png`
+    icon: `img/icons/check-in.png`,
+    group: `Activity`
   },
   {
     name: `Drive`,
-    icon: `img/icons/drive.png`
+    icon: `img/icons/drive.png`,
+    group: `Tranfer`
   },
-    {
+  {
     name: `Flight`,
-    icon: `img/icons/flight.png`
+    icon: `img/icons/flight.png`,
+    group: `Tranfer`
   },
-    {
+  {
     name: `Restaurant`,
-    icon: `img/icons/restaurant.png`
+    icon: `img/icons/restaurant.png`,
+    group: `Activity`
   },
-    {
+  {
     name: `Ship`,
-    icon: `img/icons/ship.png`
+    icon: `img/icons/ship.png`,
+    group: `Tranfer`
   },
-    {
+  {
     name: `Sightseeing`,
-    icon: `img/icons/sightseeing.png`
+    icon: `img/icons/sightseeing.png`,
+    group: `Activity`
   },
-    {
+  {
     name: `Taxi`,
-    icon:`img/icons/taxi.png`
+    icon: `img/icons/taxi.png`,
+    group: `Tranfer`
   },
-    {
+  {
     name: `Train`,
-    icon: `img/icons/train.png`
+    icon: `img/icons/train.png`,
+    group: `Tranfer`
   },
-    {
+  {
     name: `Transport`,
-    icon: `img/icons/transport.png`
+    icon: `img/icons/transport.png`,
+    group: `Tranfer`
   },
-    {
-    name: `Trip`,
-    icon:`img/icons/trip.png`
-  }
 ];
 
 const CITIES = [
@@ -87,6 +93,11 @@ const OPTIONS = [
     type: `seats`,
     name: `Choose seats`,
     price: 9
+  },
+  {
+    type: `train`,
+    name: `Travel by train`,
+    price: 40
   }
 ];
 
@@ -110,7 +121,7 @@ const getRandomIntegerNumber = (min, max) => {
 
 const getRandomArrayElements = (array, count) => {
   const randomElements = [];
-  for (var i = 0; i < count; i++) {
+  for (let i = 0; i < count; i++) {
     randomElements.push(getRandomArrayElement(array));
   }
   return randomElements;
@@ -144,16 +155,20 @@ const generateCard = () => {
   const photosCount = getRandomIntegerNumber(PHOTO_COUNT_MIN, PHOTO_COUNT_MAX);
   const descriptionSentencesCount = getRandomIntegerNumber(SENTENCES_COUNT_MIN, SENTENCES_COUNT_MAX);
   const optionsCount = getRandomIntegerNumber(OPTIONS_COUNT_MIN, OPTIONS_COUNT_MAX);
+  const firstRandomDate = getRandomDate();
+  const secondRandomDate = getRandomDate();
+  const startDate = (firstRandomDate < secondRandomDate) ? firstRandomDate : secondRandomDate;
+  const endDate = (firstRandomDate > secondRandomDate) ? firstRandomDate : secondRandomDate;
 
   return {
-    event: getRandomArrayElement(EVENTS),
-    city: getRandomArrayElement(CITIES),
+    type: getRandomArrayElement(EVENTS),
+    destination: getRandomArrayElement(CITIES),
     photos: generateArray(photosCount, generatePhoto),
     description: getRandomArrayElements(DESCRIPTION, descriptionSentencesCount),
-    startDate: getRandomDate(),
-    endDate: getRandomDate(),
+    startDate,
+    endDate,
     price: getRandomIntegerNumber(PRICE_MIN, PRICE_MAX),
-    options: getRandomArrayElements(OPTIONS, optionsCount)
+    options: Array.from(new Set(getRandomArrayElements(OPTIONS, optionsCount)))
   };
 };
 
@@ -163,4 +178,4 @@ const generateCards = (count) => {
     .map(generateCard);
 };
 
-export {generateCards};
+export {generateCards, EVENTS, CITIES, OPTIONS};

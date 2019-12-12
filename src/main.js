@@ -10,7 +10,7 @@ import {createTripInfoTemplate} from './components/trip-info.js';
 import {generateFilters} from './mock/filter.js';
 import {generateCards} from './mock/card.js';
 
-const CARDS_COUNT = 3;
+const CARDS_COUNT = 4;
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -35,7 +35,7 @@ const dayListElement = cardsListElement.querySelector(`.trip-events__list`);
 const cards = generateCards(CARDS_COUNT);
 cards.slice(1).forEach((card) => render(dayListElement, createCardTemplate(card), `beforeend`));
 
-render(cardsListElement, createCardEditTemplate(), `beforebegin`);
+render(cardsListElement, createCardEditTemplate(cards[0]), `beforebegin`);
 
 const tripInfoSection = document.querySelector(`.trip-main__trip-info`);
 render(tripInfoSection, createTripInfoTemplate(), `afterbegin`);

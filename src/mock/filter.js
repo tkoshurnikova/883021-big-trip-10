@@ -3,9 +3,9 @@ const filterNames = [
 ];
 
 const generateFilters = () => {
-  return filterNames.map((it) => {
+  return filterNames.map((item) => {
     return {
-      title: it,
+      title: item,
     };
   });
 };

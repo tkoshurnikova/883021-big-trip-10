@@ -2,7 +2,7 @@ import {formatTime} from '../utils.js';
 
 const createOffersMarkup = (offers) => {
   return offers
-    .map(({name, price} = offer) => {
+    .map(({name, price}) => {
       return (
         `<li class="event__offer">
           <span class="event__offer-title">${name}</span>
@@ -15,7 +15,7 @@ const createOffersMarkup = (offers) => {
 };
 
 export const createCardTemplate = (card) => {
-  const {event, city, photos, description, startDate, endDate, price, options} = card;
+  const {type, destination, startDate, endDate, price, options} = card;
   const offers = createOffersMarkup(options);
 
   const eventDuration = () => {
@@ -31,9 +31,9 @@ export const createCardTemplate = (card) => {
     `<li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="${event.icon}" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="${type.icon}" alt="Event type icon">
         </div>
-        <h3 class="event__title">${event.name} in ${city}</h3>
+        <h3 class="event__title">${type.name} in ${destination}</h3>
 
         <div class="event__schedule">
           <p class="event__time">
