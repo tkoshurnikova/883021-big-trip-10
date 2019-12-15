@@ -1,7 +1,7 @@
 import {EVENTS, CITIES, OPTIONS} from '../mock/card.js';
 import {formatTime, formatDate} from '../utils.js';
 
-const createEventMarkup = (event) => {
+const createEventTypeMarkup = (event) => {
   const {name} = event;
 
   return (
@@ -12,11 +12,11 @@ const createEventMarkup = (event) => {
   );
 };
 
-const createEventsMarkup = (group, events) => {
+const createEventsFieldsetMarkup = (group, events) => {
   return (
     `<fieldset class="event__type-group">
       <legend class="visually-hidden">${group}</legend>
-      ${events.filter((event) => event.group === group).map((event) => createEventMarkup(event)).join(`\n`)}
+      ${events.filter((event) => event.group === group).map((event) => createEventTypeMarkup(event)).join(`\n`)}
     </fieldset>`
   );
 };
@@ -39,7 +39,7 @@ const createOfferMarkup = (offer, card) => {
 export const createCardEditTemplate = (card) => {
   const {type, destination, photos, description, startDate, endDate, price} = card;
   const eventGroups = Array.from(new Set(EVENTS.map((event) => event.group)));
-  const events = eventGroups.map((group) => createEventsMarkup(group, EVENTS)).join(`\n`);
+  const events = eventGroups.map((group) => createEventsFieldsetMarkup(group, EVENTS)).join(`\n`);
   const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
 
   return (
