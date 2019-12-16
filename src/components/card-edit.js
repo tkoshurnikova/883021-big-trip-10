@@ -1,5 +1,5 @@
 import {EVENTS, CITIES, OPTIONS} from '../mock/card.js';
-import {formatTime, formatDate} from '../utils.js';
+import {formatTime, formatDate, createElement} from '../utils.js';
 
 const createEventTypeMarkup = (event) => {
   const {name} = event;
@@ -36,7 +36,7 @@ const createOfferMarkup = (offer, card) => {
   );
 };
 
-export const createCardEditTemplate = (card) => {
+const createCardEditTemplate = (card) => {
   const {type, destination, photos, description, startDate, endDate, price} = card;
   const eventGroups = Array.from(new Set(EVENTS.map((event) => event.group)));
   const events = eventGroups.map((group) => createEventsFieldsetMarkup(group, EVENTS)).join(`\n`);
@@ -135,3 +135,26 @@ export const createCardEditTemplate = (card) => {
     </form>`
   );
 };
+
+export default class CardEdit {
+  constructor(card) {
+    this._card = card;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCardEditTemplate(this._card);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

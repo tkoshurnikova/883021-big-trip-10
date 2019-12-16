@@ -1,4 +1,4 @@
-import {MONTHS} from '../utils.js';
+import {MONTHS, createElement} from '../utils.js';
 
 const getTripCost = (card) => {
   const {price, options} = card;
@@ -8,7 +8,7 @@ const getTripCost = (card) => {
   return tripCost;
 };
 
-export const createTripInfoTemplate = (cards) => {
+const createTripInfoTemplate = (cards) => {
   const totalCost = cards.map((card) => getTripCost(card)).reduce((sum, current) => {
     return sum + current;
   });
@@ -22,3 +22,26 @@ export const createTripInfoTemplate = (cards) => {
     </p>`
   );
 };
+
+export default class TripInfo {
+  constructor(cards) {
+    this._cards = cards;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._cards);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
