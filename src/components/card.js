@@ -1,4 +1,4 @@
-import {formatTime, formatDateForDatetime} from '../utils.js';
+import {formatTime, formatDateForDatetime, createElement} from '../utils.js';
 
 const createOffersMarkup = (offers) => {
   return offers
@@ -14,7 +14,7 @@ const createOffersMarkup = (offers) => {
     .join(`\n`);
 };
 
-export const createCardTemplate = (card) => {
+const createCardTemplate = (card) => {
   const {type, destination, startDate, endDate, price, options} = card;
   const offers = createOffersMarkup(options);
 
@@ -60,3 +60,26 @@ export const createCardTemplate = (card) => {
     </li>`
   );
 };
+
+export default class Card {
+  constructor(card) {
+    this._element = null;
+    this._card = card;
+  }
+
+  getTemplate() {
+    return createCardTemplate(this._card);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
