@@ -1,10 +1,10 @@
 import {formatDateForDatetime, MONTHS, createElement} from '../utils.js';
 
-const createDayListMarkup = (cards, date, dates) => {
+const createDayListTemplate = (date, dayNumber) => {
   return (
     `<li class="trip-days__item  day">
       <div class="day__info">
-        <span class="day__counter">${dates.indexOf(date) + 1}</span>
+        <span class="day__counter">${dayNumber}</span>
         <time class="day__date" datetime="${formatDateForDatetime(new Date(date))}">${MONTHS[new Date(date).getMonth()]} ${new Date(date).getDate()}</time>
       </div>
       <ul class="trip-events__list">
@@ -14,22 +14,15 @@ const createDayListMarkup = (cards, date, dates) => {
   );
 };
 
-const createDayListTemplate = (cards, uniqueDate, uniqueDates) => {
-  return (
-    `${createDayListMarkup(cards, uniqueDate, uniqueDates)}`
-  );
-};
-
 export default class DayList {
-  constructor(cards, uniqueDate, uniqueDates) {
+  constructor(date, dayNumber) {
     this._element = null;
-    this._cards = cards;
-    this._uniqueDate = uniqueDate;
-    this._uniqueDates = uniqueDates;
+    this._date = date;
+    this._dayNumber = dayNumber;
   }
 
   getTemplate() {
-    return createDayListTemplate(this._cards, this._uniqueDate, this._uniqueDates);
+    return createDayListTemplate(this._date, this._dayNumber);
   }
 
   getElement() {

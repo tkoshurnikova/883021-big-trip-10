@@ -26,7 +26,7 @@ render(cardsListSection, new CardsListComponent().getElement(), RenderPosition.B
 const cards = generateCards(CARDS_COUNT);
 
 const cardsListElement = cardsListSection.querySelector(`.trip-days`);
-const startDates = cards.slice(1).map((card) => card.startDate.toDateString());
+const startDates = cards.map((card) => card.startDate.toDateString());
 const uniqueDates = Array.from(new Set(startDates)).sort((a, b) => {
   return new Date(a) - new Date(b);
 });
@@ -58,7 +58,8 @@ const renderCard = (card, day) => {
 };
 
 uniqueDates.forEach((uniqueDate) => {
-  const day = new DayListComponent(cards, uniqueDate, uniqueDates).getElement();
+  const uniqueDateNumber = uniqueDates.indexOf(uniqueDate) + 1;
+  const day = new DayListComponent(uniqueDate, uniqueDateNumber).getElement();
   cards
   .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
   .forEach((card) => renderCard(card, day));
@@ -66,5 +67,8 @@ uniqueDates.forEach((uniqueDate) => {
   render(cardsListElement, day, RenderPosition.BEFOREEND);
 });
 
-const tripInfoSection = document.querySelector(`.trip-main__trip-info`);
-render(tripInfoSection, new TripInfoComponent(cards).getElement(), RenderPosition.AFTERBEGIN);
+const sortedCards = cards.sort((a, b) => {
+  return new Date(a.startDate) - new Date(b.startDate);
+});
+const tripMain = document.querySelector(`.trip-main`);
+render(tripMain, new TripInfoComponent(sortedCards).getElement(), RenderPosition.AFTERBEGIN);
