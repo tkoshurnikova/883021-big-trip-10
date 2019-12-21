@@ -57,17 +57,13 @@ if (doCardsExist) {
       }
     };
 
-    const editButton = cardComponent.getElement().querySelector(`.event__rollup-btn`);
-    editButton.addEventListener(`click`, () => {
+    cardComponent.setEditButtonClickHandler(() => {
       replaceCardToEdit();
       document.addEventListener(`keydown`, onEscKeyDown);
     });
 
-    const closeButton = cardEditComponent.getElement().querySelector(`.event__rollup-btn`);
-    closeButton.addEventListener(`click`, () => replaceEditToCard());
-
-    const editForm = cardEditComponent.getElement();
-    editForm.addEventListener(`submit`, (evt) => {
+    cardEditComponent.setRollUpButtonClickHandler(() => replaceEditToCard());
+    cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
       replaceEditToCard();
     });
