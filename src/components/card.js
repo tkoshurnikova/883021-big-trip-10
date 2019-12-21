@@ -20,10 +20,9 @@ const createCardTemplate = (card) => {
   const offers = createOffersMarkup(options);
 
   const eventDuration = () => {
-    let hours = endDate.getHours() - startDate.getHours();
-    hours = (hours > 0) ? hours : hours + 24;
-    let minutes = endDate.getMinutes() - startDate.getMinutes();
-    hours = (minutes > 0) ? hours : hours - 1;
+    const durationInMs = endDate - startDate;
+    let hours = Math.floor(durationInMs / 3600000);
+    let minutes = Math.floor((durationInMs % 3600000) / 60000);
     minutes = (minutes > 0) ? minutes : minutes + 60;
     return `${hours}H ${minutes}M`;
   };
