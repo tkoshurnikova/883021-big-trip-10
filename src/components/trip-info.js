@@ -1,4 +1,4 @@
-import {MONTHS} from '../utils.js';
+import {MONTHS} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
 const getTripCost = (card) => {

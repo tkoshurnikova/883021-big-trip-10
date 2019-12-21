@@ -1,4 +1,4 @@
-import {formatDateForDatetime, MONTHS} from '../utils.js';
+import {formatDateForDatetime, MONTHS} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
 const createDayListTemplate = (date, dayNumber) => {

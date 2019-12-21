@@ -10,15 +10,15 @@ import NoCardsComponent from './components/no-cards.js';
 
 import {generateFilters} from './mock/filter.js';
 import {generateCards} from './mock/card.js';
-import {render, RenderPosition} from './utils.js';
+import {render, replace, RenderPosition} from './utils/render.js';
 
 const CARDS_COUNT = 4;
 
 const siteHeaderElement = document.querySelector(`.trip-main__trip-controls`);
-render(siteHeaderElement, new SiteMenuComponent().getElement(), RenderPosition.AFTERBEGIN);
+render(siteHeaderElement, new SiteMenuComponent(), RenderPosition.AFTERBEGIN);
 
 const filters = generateFilters();
-render(siteHeaderElement, new FilterComponent(filters).getElement(), RenderPosition.BEFOREEND);
+render(siteHeaderElement, new FilterComponent(filters), RenderPosition.BEFOREEND);
 
 const cardsListSection = document.querySelector(`.trip-events`);
 const cards = generateCards(CARDS_COUNT);
@@ -26,8 +26,8 @@ const cards = generateCards(CARDS_COUNT);
 const doCardsExist = cards.length;
 
 if (doCardsExist) {
-  render(cardsListSection, new SortComponent().getElement(), RenderPosition.BEFOREEND);
-  render(cardsListSection, new CardsListComponent().getElement(), RenderPosition.BEFOREEND);
+  render(cardsListSection, new SortComponent(), RenderPosition.BEFOREEND);
+  render(cardsListSection, new CardsListComponent(), RenderPosition.BEFOREEND);
 
   const cardsListElement = cardsListSection.querySelector(`.trip-days`);
   const startDates = cards.map((card) => card.startDate.toDateString());
@@ -41,11 +41,11 @@ if (doCardsExist) {
     const daysList = day.querySelector(`.trip-events__list`);
 
     const replaceCardToEdit = () => {
-      daysList.replaceChild(cardEditComponent.getElement(), cardComponent.getElement());
+      replace(cardEditComponent, cardComponent);
     };
 
     const replaceEditToCard = () => {
-      daysList.replaceChild(cardComponent.getElement(), cardEditComponent.getElement());
+      replace(cardComponent, cardEditComponent);
     };
 
     const onEscKeyDown = (evt) => {
@@ -72,15 +72,15 @@ if (doCardsExist) {
       replaceEditToCard();
     });
 
-    render(daysList, cardComponent.getElement(), RenderPosition.BEFOREEND);
+    render(daysList, cardComponent, RenderPosition.BEFOREEND);
   };
 
   uniqueDates.forEach((uniqueDate) => {
     const uniqueDateNumber = uniqueDates.indexOf(uniqueDate) + 1;
-    const day = new DayListComponent(uniqueDate, uniqueDateNumber).getElement();
+    const day = new DayListComponent(uniqueDate, uniqueDateNumber);
     cards
     .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
-    .forEach((card) => renderCard(card, day));
+    .forEach((card) => renderCard(card, day.getElement()));
 
     render(cardsListElement, day, RenderPosition.BEFOREEND);
   });
@@ -89,7 +89,7 @@ if (doCardsExist) {
     return new Date(a.startDate) - new Date(b.startDate);
   });
   const tripMain = document.querySelector(`.trip-main`);
-  render(tripMain, new TripInfoComponent(sortedCards).getElement(), RenderPosition.AFTERBEGIN);
+  render(tripMain, new TripInfoComponent(sortedCards), RenderPosition.AFTERBEGIN);
 } else {
-  render(cardsListSection, new NoCardsComponent().getElement(), RenderPosition.BEFOREEND);
+  render(cardsListSection, new NoCardsComponent(), RenderPosition.BEFOREEND);
 }

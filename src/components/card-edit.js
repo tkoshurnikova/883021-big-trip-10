@@ -1,5 +1,5 @@
 import {EVENTS, CITIES, OPTIONS} from '../mock/card.js';
-import {formatTime, formatDate} from '../utils.js';
+import {formatTime, formatDate} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
 const createEventTypeMarkup = (event) => {
