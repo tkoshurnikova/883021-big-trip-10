@@ -1,5 +1,6 @@
 import {EVENTS, CITIES, OPTIONS} from '../mock/card.js';
-import {formatTime, formatDate, createElement} from '../utils.js';
+import {formatTime, formatDate} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 const createEventTypeMarkup = (event) => {
   const {name} = event;
@@ -136,25 +137,13 @@ const createCardEditTemplate = (card) => {
   );
 };
 
-export default class CardEdit {
+export default class CardEdit extends AbstractComponent {
   constructor(card) {
+    super();
     this._card = card;
-    this._element = null;
   }
 
   getTemplate() {
     return createCardEditTemplate(this._card);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

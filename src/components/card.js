@@ -1,4 +1,5 @@
-import {formatTime, formatDateForDatetime, createElement} from '../utils.js';
+import {formatTime, formatDateForDatetime} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 const createOffersMarkup = (offers) => {
   return offers
@@ -61,25 +62,13 @@ const createCardTemplate = (card) => {
   );
 };
 
-export default class Card {
+export default class Card extends AbstractComponent {
   constructor(card) {
-    this._element = null;
+    super();
     this._card = card;
   }
 
   getTemplate() {
     return createCardTemplate(this._card);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

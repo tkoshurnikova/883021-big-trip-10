@@ -1,4 +1,5 @@
-import {formatDateForDatetime, MONTHS, createElement} from '../utils.js';
+import {formatDateForDatetime, MONTHS} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 const createDayListTemplate = (date, dayNumber) => {
   return (
@@ -14,26 +15,14 @@ const createDayListTemplate = (date, dayNumber) => {
   );
 };
 
-export default class DayList {
+export default class DayList extends AbstractComponent {
   constructor(date, dayNumber) {
-    this._element = null;
+    super();
     this._date = date;
     this._dayNumber = dayNumber;
   }
 
   getTemplate() {
     return createDayListTemplate(this._date, this._dayNumber);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
