@@ -56,8 +56,8 @@ export default class TripController {
     const container = this._container;
     const doCardsExist = cards.length;
     const sortedCardsByDate = cards.slice().sort((a, b) => {
-        return a.startDate - b.startDate;
-      });
+      return a.startDate - b.startDate;
+    });
 
     if (doCardsExist) {
       render(container, this._sortComponent, RenderPosition.BEFOREEND);
