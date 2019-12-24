@@ -55,6 +55,9 @@ export default class TripController {
   renderCards(cards) {
     const container = this._container;
     const doCardsExist = cards.length;
+    const sortedCardsByDate = cards.slice().sort((a, b) => {
+        return a.startDate - b.startDate;
+      });
 
     if (doCardsExist) {
       render(container, this._sortComponent, RenderPosition.BEFOREEND);
@@ -70,7 +73,7 @@ export default class TripController {
         uniqueDates.forEach((uniqueDate) => {
           const uniqueDateNumber = uniqueDates.indexOf(uniqueDate) + 1;
           const day = new DayListComponent(uniqueDate, uniqueDateNumber);
-          cards
+          sortedCardsByDate
           .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
           .forEach((card) => this.renderCard(card, day.getElement()));
 
@@ -113,9 +116,6 @@ export default class TripController {
         }
       });
 
-      const sortedCardsByDate = cards.slice().sort((a, b) => {
-        return new Date(a.startDate) - new Date(b.startDate);
-      });
       const tripMain = document.querySelector(`.trip-main`);
       render(tripMain, new TripInfoComponent(sortedCardsByDate), RenderPosition.AFTERBEGIN);
     } else {
