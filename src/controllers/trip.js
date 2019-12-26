@@ -1,12 +1,11 @@
-import CardComponent from '../components/card.js';
-import CardEditComponent from '../components/card-edit.js';
 import SortComponent, {SortType} from '../components/sort.js';
 import CardsListComponent from '../components/cards-list.js';
 import DayListComponent from '../components/day-list.js';
 import NoCardsComponent from '../components/no-cards.js';
 import TripInfoComponent from '../components/trip-info.js';
+import PointController from './point.js';
 
-import {render, replace, RenderPosition} from '../utils/render.js';
+import {render, RenderPosition} from '../utils/render.js';
 
 export default class TripController {
   constructor(container) {
@@ -14,42 +13,6 @@ export default class TripController {
     this._sortComponent = new SortComponent();
     this._cardsListComponent = new CardsListComponent();
     this._noCardsComponent = new NoCardsComponent();
-  }
-
-  renderCard(card, day) {
-    const cardComponent = new CardComponent(card);
-    const cardEditComponent = new CardEditComponent(card);
-    const daysList = day.querySelector(`.trip-events__list`);
-
-    const replaceCardToEdit = () => {
-      replace(cardEditComponent, cardComponent);
-    };
-
-    const replaceEditToCard = () => {
-      replace(cardComponent, cardEditComponent);
-    };
-
-    const onEscKeyDown = (evt) => {
-      const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
-      if (isEscKey) {
-        replaceEditToCard();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-
-    cardComponent.setEditButtonClickHandler(() => {
-      replaceCardToEdit();
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
-
-    cardEditComponent.setRollUpButtonClickHandler(() => replaceEditToCard());
-    cardEditComponent.setSubmitHandler((evt) => {
-      evt.preventDefault();
-      replaceEditToCard();
-    });
-
-    render(daysList, cardComponent, RenderPosition.BEFOREEND);
   }
 
   renderCards(cards) {
@@ -75,7 +38,10 @@ export default class TripController {
           const day = new DayListComponent(uniqueDate, uniqueDateNumber);
           sortedCardsByDate
           .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
-          .forEach((card) => this.renderCard(card, day.getElement()));
+          .forEach((card) => {
+            const pointController = new PointController(day);
+            pointController.render(card);
+          });
 
           render(cardsListElement, day, RenderPosition.BEFOREEND);
         });
