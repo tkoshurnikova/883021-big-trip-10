@@ -102,7 +102,16 @@ export default class TripController {
     if (sortType === SortType.EVENT) {
       this.renderCards(this._cards);
     } else {
-      this._pointControllers = sortedCards.forEach((card) => new PointController(dayBlockWithoutDate, this._onDataChange, this._onViewChange).render(card));
+      const pointControllers = [];
+      const renderCardsWithoutDays = () => {
+        sortedCards.forEach((card) => {
+          const pointController = new PointController(dayBlockWithoutDate, this._onDataChange, this._onViewChange);
+          pointController.render(card);
+          pointControllers.push(pointController);
+        });
+        return pointControllers;
+      };
+      this._pointControllers = renderCardsWithoutDays();
     }
   }
 
