@@ -141,6 +141,9 @@ export default class CardEdit extends AbstractSmartComponent {
     super();
     this._card = card;
     this._subscribeOnEvents();
+    this._rollUpButtonClickHandler = null;
+    this._submitHandler = null;
+    this._favoriteButtonHandler = null;
   }
 
   getTemplate() {
@@ -150,18 +153,23 @@ export default class CardEdit extends AbstractSmartComponent {
   setRollUpButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`)
       .addEventListener(`click`, handler);
+    this._rollUpButtonClickHandler = handler;
   }
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+    this._submitHandler = handler;
   }
 
   setFavouriteButtonHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-btn`)
-    .addEventListener(`click`, handler);
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoriteButtonHandler = handler;
   }
 
   recoveryListeners() {
+    this.setRollUpButtonClickHandler(this._rollUpButtonClickHandler);
+    this.setSubmitHandler(this._submitHandler);
+    this.setFavouriteButtonHandler(this._favoriteButtonHandler);
     this._subscribeOnEvents();
   }
 
