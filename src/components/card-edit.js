@@ -1,23 +1,21 @@
-import {EVENTS, CITIES, OPTIONS} from '../mock/card.js';
-import {formatTime, formatDate} from '../utils/common.js';
-import AbstractComponent from './abstract-component.js';
+import {EVENTS, DESTINATIONS, OPTIONS} from '../mock/card.js';
+import {formatTime, formatDate, uppercaseFirstLetter} from '../utils/common.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
 const createEventTypeMarkup = (event) => {
-  const {name} = event;
-
   return (
     `<div class="event__type-item">
-      <input id="event-type-${name.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${name.toLowerCase()}">
-      <label class="event__type-label  event__type-label--${name.toLowerCase()}" for="event-type-${name.toLowerCase()}-1">${name}</label>
+      <input id="event-type-${event}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${event}">
+      <label class="event__type-label  event__type-label--${event}" for="event-type-${event}-1">${uppercaseFirstLetter(event)}</label>
     </div>`
   );
 };
 
-const createEventsFieldsetMarkup = (group, events) => {
+const createEventsFieldsetMarkup = (group) => {
   return (
     `<fieldset class="event__type-group">
       <legend class="visually-hidden">${group}</legend>
-      ${events.filter((event) => event.group === group).map((event) => createEventTypeMarkup(event)).join(`\n`)}
+      ${group.map((element) => createEventTypeMarkup(element)).join(`\n`)}
     </fieldset>`
   );
 };
@@ -39,8 +37,8 @@ const createOfferMarkup = (offer, card) => {
 
 const createCardEditTemplate = (card) => {
   const {type, destination, photos, description, startDate, endDate, price, isFavorite} = card;
-  const eventGroups = Array.from(new Set(EVENTS.map((event) => event.group)));
-  const events = eventGroups.map((group) => createEventsFieldsetMarkup(group, EVENTS)).join(`\n`);
+  const eventGroups = Object.keys(EVENTS);
+  const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group])).join(`\n`);
   const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
   const isChecked = isFavorite ? `checked` : ``;
 
@@ -50,7 +48,7 @@ const createCardEditTemplate = (card) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -61,13 +59,13 @@ const createCardEditTemplate = (card) => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${type.name} at
+            ${uppercaseFirstLetter(type)} in
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
           <datalist id="destination-list-1">
-    ${CITIES.map((city) => {
+    ${DESTINATIONS.map((item) => {
       return (
-        `<option value="${city}"></option>`
+        `<option value="${item.city}"></option>`
       );
     }).join(`\n`)}
           </datalist>
@@ -138,10 +136,11 @@ const createCardEditTemplate = (card) => {
   );
 };
 
-export default class CardEdit extends AbstractComponent {
+export default class CardEdit extends AbstractSmartComponent {
   constructor(card) {
     super();
     this._card = card;
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
@@ -160,5 +159,34 @@ export default class CardEdit extends AbstractComponent {
   setFavouriteButtonHandler(handler) {
     this.getElement().querySelector(`.event__favorite-btn`)
     .addEventListener(`click`, handler);
+  }
+
+  recoveryListeners() {
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
+      if (evt.target.tagName === `INPUT`) {
+        this._card.type = evt.target.value;
+        this.rerender();
+      }
+    });
+
+    element.querySelector(`#event-destination-1`).addEventListener(`change`, (evt) => {
+      DESTINATIONS.forEach((destination) => {
+        if (this._card.destination === destination.city) {
+          this._card.destination = evt.target.value;
+          this._card.description = destination.description;
+          this.rerender();
+        }
+      });
+    });
   }
 }

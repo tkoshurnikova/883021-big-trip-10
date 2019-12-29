@@ -27,5 +27,9 @@ const formatDateForDatetime = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-export {MONTHS, formatTime, formatDate, formatDateForDatetime};
+const uppercaseFirstLetter = (element) => {
+  return element[0].toUpperCase() + element.slice(1);
+};
+
+export {MONTHS, formatTime, formatDate, formatDateForDatetime, uppercaseFirstLetter};
 

@@ -1,63 +1,15 @@
-const EVENTS = [
-  {
-    name: `Bus`,
-    icon: `img/icons/bus.png`,
-    group: `Tranfer`
-  },
-  {
-    name: `Check-in`,
-    icon: `img/icons/check-in.png`,
-    group: `Activity`
-  },
-  {
-    name: `Drive`,
-    icon: `img/icons/drive.png`,
-    group: `Tranfer`
-  },
-  {
-    name: `Flight`,
-    icon: `img/icons/flight.png`,
-    group: `Tranfer`
-  },
-  {
-    name: `Restaurant`,
-    icon: `img/icons/restaurant.png`,
-    group: `Activity`
-  },
-  {
-    name: `Ship`,
-    icon: `img/icons/ship.png`,
-    group: `Tranfer`
-  },
-  {
-    name: `Sightseeing`,
-    icon: `img/icons/sightseeing.png`,
-    group: `Activity`
-  },
-  {
-    name: `Taxi`,
-    icon: `img/icons/taxi.png`,
-    group: `Tranfer`
-  },
-  {
-    name: `Train`,
-    icon: `img/icons/train.png`,
-    group: `Tranfer`
-  },
-  {
-    name: `Transport`,
-    icon: `img/icons/transport.png`,
-    group: `Tranfer`
-  },
-];
+const EVENTS = {
+  TRANSFER: [`bus`, `drive`, `flight`, `ship`, `taxi`, `train`, `transport`],
+  ACTIVITY: [`check-in`, `restaurant`, `sightseeing`]
+};
 
-const CITIES = [
-  `Amsterdam`,
-  `Budapest`,
-  `Paris`,
-  `London`,
-  `Moscow`
-];
+// const CITIES = [
+//   `Amsterdam`,
+//   `Budapest`,
+//   `Paris`,
+//   `London`,
+//   `Moscow`
+// ];
 
 const DESCRIPTION = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
@@ -137,6 +89,17 @@ const generateArray = (count, element) => {
     .map(element);
 };
 
+// const generateDestination = (cities, description) => {
+//   const descriptionSentencesCount = getRandomIntegerNumber(SENTENCES_COUNT_MIN, SENTENCES_COUNT_MAX);
+
+//   const Destination = new Object();
+//   Destination.city = getRandomArrayElement(cities);
+//   Destination.description = getRandomArrayElements(description, descriptionSentencesCount);
+
+//   return Destination;
+//   console.log(Destination)
+// }
+
 const getRandomDate = () => {
   const targetDate = new Date();
   const sign = Math.random() > 0.5 ? 1 : -1;
@@ -151,20 +114,48 @@ const getRandomDate = () => {
   return targetDate;
 };
 
+const generateDescription = () => {
+  const descriptionSentencesCount = getRandomIntegerNumber(SENTENCES_COUNT_MIN, SENTENCES_COUNT_MAX);
+  return getRandomArrayElements(DESCRIPTION, descriptionSentencesCount);
+};
+
+const DESTINATIONS = [
+  {
+    city: `Amsterdam`,
+    description: generateDescription()
+  },
+  {
+    city: `Budapest`,
+    description: generateDescription()
+  },
+  {
+    city: `Paris`,
+    description: generateDescription()
+  },
+  {
+    city: `London`,
+    description: generateDescription()
+  },
+  {
+    city: `Moscow`,
+    description: generateDescription()
+  },
+];
+
 const generateCard = () => {
   const photosCount = getRandomIntegerNumber(PHOTO_COUNT_MIN, PHOTO_COUNT_MAX);
-  const descriptionSentencesCount = getRandomIntegerNumber(SENTENCES_COUNT_MIN, SENTENCES_COUNT_MAX);
   const optionsCount = getRandomIntegerNumber(OPTIONS_COUNT_MIN, OPTIONS_COUNT_MAX);
   const firstRandomDate = getRandomDate();
   const secondRandomDate = getRandomDate();
   const startDate = (firstRandomDate < secondRandomDate) ? firstRandomDate : secondRandomDate;
   const endDate = (firstRandomDate > secondRandomDate) ? firstRandomDate : secondRandomDate;
+  const destination = getRandomArrayElement(DESTINATIONS);
 
   return {
-    type: getRandomArrayElement(EVENTS),
-    destination: getRandomArrayElement(CITIES),
+    type: (Math.random > 0.5) ? getRandomArrayElement(EVENTS.TRANSFER) : getRandomArrayElement(EVENTS.ACTIVITY),
+    destination: destination.city,
     photos: generateArray(photosCount, generatePhoto),
-    description: getRandomArrayElements(DESCRIPTION, descriptionSentencesCount),
+    description: destination.description,
     startDate,
     endDate,
     price: getRandomIntegerNumber(PRICE_MIN, PRICE_MAX),
@@ -179,4 +170,4 @@ const generateCards = (count) => {
     .map(generateCard);
 };
 
-export {generateCards, EVENTS, CITIES, OPTIONS};
+export {generateCards, EVENTS, DESTINATIONS, OPTIONS};
