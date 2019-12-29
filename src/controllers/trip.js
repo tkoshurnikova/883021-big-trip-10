@@ -13,6 +13,7 @@ export default class TripController {
     this._sortComponent = new SortComponent();
     this._cardsListComponent = new CardsListComponent();
     this._noCardsComponent = new NoCardsComponent();
+    this._onDataChange = this._onDataChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._cards = [];
@@ -21,8 +22,8 @@ export default class TripController {
   renderCards(cards) {
     this._cards = cards;
     const container = this._container;
-    const doCardsExist = cards.length;
-    const sortedCardsByDate = cards.slice().sort((a, b) => {
+    const doCardsExist = this._cards.length;
+    const sortedCardsByDate = this._cards.slice().sort((a, b) => {
       return a.startDate - b.startDate;
     });
 
@@ -31,7 +32,7 @@ export default class TripController {
       render(container, this._cardsListComponent, RenderPosition.BEFOREEND);
 
       const cardsListElement = container.querySelector(`.trip-days`);
-      const startDates = cards.map((card) => card.startDate.toDateString());
+      const startDates = this._cards.map((card) => card.startDate.toDateString());
       const uniqueDates = Array.from(new Set(startDates)).sort((a, b) => {
         return new Date(a) - new Date(b);
       });
@@ -42,7 +43,7 @@ export default class TripController {
           const day = new DayListComponent(uniqueDate, uniqueDateNumber);
           sortedCardsByDate
           .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
-          .forEach((card) => new PointController(day).render(card));
+          .forEach((card) => new PointController(day, this._onDataChange).render(card));
           render(cardsListElement, day, RenderPosition.BEFOREEND);
         });
       };
@@ -89,7 +90,19 @@ export default class TripController {
     if (sortType === SortType.EVENT) {
       this.renderCards(this._cards);
     } else {
-      sortedCards.forEach((card) => new PointController(dayBlockWithoutDate).render(card));
+      sortedCards.forEach((card) => new PointController(dayBlockWithoutDate, this._onDataChange).render(card));
     }
+  }
+
+  _onDataChange(pointController, oldData, newData) {
+    const index = this._cards.findIndex((card) => card === oldData);
+
+    if (index === -1) {
+      return;
+    }
+
+    this._cards = [].concat(this._cards.slice(0, index), newData, this._cards.slice(index + 1));
+
+    pointController.render(this._cards[index]);
   }
 }

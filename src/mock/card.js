@@ -168,7 +168,8 @@ const generateCard = () => {
     startDate,
     endDate,
     price: getRandomIntegerNumber(PRICE_MIN, PRICE_MAX),
-    options: Array.from(new Set(getRandomArrayElements(OPTIONS, optionsCount)))
+    options: Array.from(new Set(getRandomArrayElements(OPTIONS, optionsCount))),
+    isFavorite: Math.random() > 0.5
   };
 };
 

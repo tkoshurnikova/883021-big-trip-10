@@ -38,10 +38,11 @@ const createOfferMarkup = (offer, card) => {
 };
 
 const createCardEditTemplate = (card) => {
-  const {type, destination, photos, description, startDate, endDate, price} = card;
+  const {type, destination, photos, description, startDate, endDate, price, isFavorite} = card;
   const eventGroups = Array.from(new Set(EVENTS.map((event) => event.group)));
   const events = eventGroups.map((group) => createEventsFieldsetMarkup(group, EVENTS)).join(`\n`);
   const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
+  const isChecked = isFavorite ? `checked` : ``;
 
   return (
     `<form class="event  event--edit" action="#" method="post">
@@ -95,7 +96,7 @@ const createCardEditTemplate = (card) => {
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
 
-        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
         <label class="event__favorite-btn" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -154,5 +155,10 @@ export default class CardEdit extends AbstractComponent {
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+  }
+
+  setFavouriteButtonHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`)
+    .addEventListener(`click`, handler);
   }
 }
