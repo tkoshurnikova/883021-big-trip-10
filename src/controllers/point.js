@@ -2,13 +2,20 @@ import CardComponent from '../components/card.js';
 import CardEditComponent from '../components/card-edit.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
 
+const Mode = {
+  DEFAULT: `default`,
+  EDIT: `edit`,
+};
+
 export default class PointController {
-  constructor(container, onDataChange) {
+  constructor(container, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;
+    this._onViewChange = onViewChange;
     this._cardComponent = null;
     this._cardEditComponent = null;
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._mode = Mode.DEFAULT;
   }
 
   render(card) {
@@ -44,12 +51,21 @@ export default class PointController {
     }
   }
 
+  setDefaultView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceEditToCard();
+    }
+  }
+
   _replaceCardToEdit() {
+    this._onViewChange();
     replace(this._cardEditComponent, this._cardComponent);
+    this._mode = Mode.EDIT;
   }
 
   _replaceEditToCard() {
     replace(this._cardComponent, this._cardEditComponent);
+    this._mode = Mode.DEFAULT;
   }
 
   _onEscKeyDown(evt) {

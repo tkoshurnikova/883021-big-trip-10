@@ -14,9 +14,11 @@ export default class TripController {
     this._cardsListComponent = new CardsListComponent();
     this._noCardsComponent = new NoCardsComponent();
     this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._cards = [];
+    this._pointControllers = [];
   }
 
   renderCards(cards) {
@@ -38,17 +40,27 @@ export default class TripController {
       });
 
       const renderCardsByDays = () => {
+        const pointControllers = [];
         uniqueDates.forEach((uniqueDate) => {
+
           const uniqueDateNumber = uniqueDates.indexOf(uniqueDate) + 1;
           const day = new DayListComponent(uniqueDate, uniqueDateNumber);
+
           sortedCardsByDate
           .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
-          .forEach((card) => new PointController(day, this._onDataChange).render(card));
+          .forEach((card) => {
+            const pointController = new PointController(day, this._onDataChange, this._onViewChange);
+            pointController.render(card);
+            pointControllers.push(pointController);
+          });
+
           render(cardsListElement, day, RenderPosition.BEFOREEND);
         });
+
+        return pointControllers;
       };
 
-      renderCardsByDays();
+      this._pointControllers = renderCardsByDays();
       const tripMain = document.querySelector(`.trip-main`);
 
       if (!tripMain.querySelector(`.trip-info`)) {
@@ -90,7 +102,7 @@ export default class TripController {
     if (sortType === SortType.EVENT) {
       this.renderCards(this._cards);
     } else {
-      sortedCards.forEach((card) => new PointController(dayBlockWithoutDate, this._onDataChange).render(card));
+      this._pointControllers = sortedCards.forEach((card) => new PointController(dayBlockWithoutDate, this._onDataChange, this._onViewChange).render(card));
     }
   }
 
@@ -104,5 +116,9 @@ export default class TripController {
     this._cards = [].concat(this._cards.slice(0, index), newData, this._cards.slice(index + 1));
 
     pointController.render(this._cards[index]);
+  }
+
+  _onViewChange() {
+    this._pointControllers.forEach((item) => item.setDefaultView());
   }
 }
