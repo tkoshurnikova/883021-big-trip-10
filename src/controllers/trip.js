@@ -38,11 +38,7 @@ export default class TripController {
           const day = new DayListComponent(uniqueDate, uniqueDateNumber);
           sortedCardsByDate
           .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
-          .forEach((card) => {
-            const pointController = new PointController(day);
-            pointController.render(card);
-          });
-
+          .forEach((card) => new PointController(day).render(card));
           render(cardsListElement, day, RenderPosition.BEFOREEND);
         });
       };
@@ -78,7 +74,7 @@ export default class TripController {
         if (sortType === SortType.EVENT) {
           renderCardsByDays();
         } else {
-          sortedCards.forEach((card) => this.renderCard(card, dayBlockWithoutDate.getElement()));
+          sortedCards.forEach((card) => new PointController(dayBlockWithoutDate).render(card));
         }
       });
 
