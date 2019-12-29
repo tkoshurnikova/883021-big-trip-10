@@ -13,9 +13,13 @@ export default class TripController {
     this._sortComponent = new SortComponent();
     this._cardsListComponent = new CardsListComponent();
     this._noCardsComponent = new NoCardsComponent();
+    this._onSortTypeChange = this._onSortTypeChange.bind(this);
+    this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
+    this._cards = [];
   }
 
   renderCards(cards) {
+    this._cards = cards;
     const container = this._container;
     const doCardsExist = cards.length;
     const sortedCardsByDate = cards.slice().sort((a, b) => {
@@ -44,44 +48,48 @@ export default class TripController {
       };
 
       renderCardsByDays();
-
-      this._sortComponent.setSortTypeChangeHandler((sortType) => {
-        let sortedCards = [];
-
-        switch (sortType) {
-
-          case SortType.TIME:
-            sortedCards = cards.slice().sort((a, b) => {
-              return (b.endDate - b.startDate) - (a.endDate - a.startDate);
-            });
-            break;
-
-          case SortType.PRICE:
-            sortedCards = cards.slice().sort((a, b) => {
-              return b.price - a.price;
-            });
-            break;
-
-          case SortType.EVENT:
-            sortedCards = cards;
-            break;
-        }
-
-        cardsListElement.innerHTML = ``;
-        const dayBlockWithoutDate = new DayListComponent(``, ``);
-        render(cardsListElement, dayBlockWithoutDate, RenderPosition.BEFOREEND);
-
-        if (sortType === SortType.EVENT) {
-          renderCardsByDays();
-        } else {
-          sortedCards.forEach((card) => new PointController(dayBlockWithoutDate).render(card));
-        }
-      });
-
       const tripMain = document.querySelector(`.trip-main`);
-      render(tripMain, new TripInfoComponent(sortedCardsByDate), RenderPosition.AFTERBEGIN);
+
+      if (!tripMain.querySelector(`.trip-info`)) {
+        render(tripMain, new TripInfoComponent(sortedCardsByDate), RenderPosition.AFTERBEGIN);
+      }
+
     } else {
       render(container, this._noCardsComponent, RenderPosition.BEFOREEND);
+    }
+  }
+
+  _onSortTypeChange(sortType) {
+    let sortedCards = [];
+
+    switch (sortType) {
+
+      case SortType.TIME:
+        sortedCards = this._cards.slice().sort((a, b) => {
+          return (b.endDate - b.startDate) - (a.endDate - a.startDate);
+        });
+        break;
+
+      case SortType.PRICE:
+        sortedCards = this._cards.slice().sort((a, b) => {
+          return b.price - a.price;
+        });
+        break;
+
+      case SortType.EVENT:
+        sortedCards = this._cards;
+        break;
+    }
+
+    const cardsListElement = this._cardsListComponent.getElement();
+    cardsListElement.innerHTML = ``;
+    const dayBlockWithoutDate = new DayListComponent(``, ``);
+    render(cardsListElement, dayBlockWithoutDate, RenderPosition.BEFOREEND);
+
+    if (sortType === SortType.EVENT) {
+      this.renderCards(this._cards);
+    } else {
+      sortedCards.forEach((card) => new PointController(dayBlockWithoutDate).render(card));
     }
   }
 }
