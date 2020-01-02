@@ -35,8 +35,9 @@ const createOfferMarkup = (offer, card) => {
   );
 };
 
-const createCardEditTemplate = (card) => {
-  const {type, destination, photos, description, startDate, endDate, price, isFavorite} = card;
+const createCardEditTemplate = (card, options = {}) => {
+  const {photos, description, startDate, endDate, price, isFavorite} = card;
+  const {type, destination} = options;
   const eventGroups = Object.keys(EVENTS);
   const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group])).join(`\n`);
   const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
@@ -140,14 +141,21 @@ export default class CardEdit extends AbstractSmartComponent {
   constructor(card) {
     super();
     this._card = card;
+    this._cardType = card.type;
+    this._cardDestination = card.destination;
+
     this._subscribeOnEvents();
+
     this._rollUpButtonClickHandler = null;
     this._submitHandler = null;
     this._favoriteButtonHandler = null;
   }
 
   getTemplate() {
-    return createCardEditTemplate(this._card);
+    return createCardEditTemplate(this._card, {
+      type: this._cardType,
+      destination: this._cardDestination
+    });
   }
 
   setRollUpButtonClickHandler(handler) {
@@ -182,15 +190,15 @@ export default class CardEdit extends AbstractSmartComponent {
 
     element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
       if (evt.target.tagName === `INPUT`) {
-        this._card.type = evt.target.value;
+        this._cardType = evt.target.value;
         this.rerender();
       }
     });
 
-    element.querySelector(`#event-destination-1`).addEventListener(`change`, (evt) => {
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
       DESTINATIONS.forEach((destination) => {
-        if (this._card.destination === destination.city) {
-          this._card.destination = evt.target.value;
+        if (this._cardDestination === destination.city) {
+          this._cardDestination = evt.target.value;
           this._card.description = destination.description;
           this.rerender();
         }
