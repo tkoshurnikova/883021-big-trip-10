@@ -1,11 +1,11 @@
-import {formatDateForDatetime, MONTHS} from '../utils/common.js';
+import {formatDateForDatetime, getMonth} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
 const dateInfo = (date, dayNumber) => {
   if (date !== ``) {
     return (
       `<span class="day__counter">${dayNumber}</span>
-        <time class="day__date" datetime="${formatDateForDatetime(new Date(date))}">${MONTHS[new Date(date).getMonth()]} ${new Date(date).getDate()}</time>`
+        <time class="day__date" datetime="${formatDateForDatetime(new Date(date))}">${getMonth(new Date(date))} ${new Date(date).getDate()}</time>`
     );
   } else {
     return (``);
@@ -19,7 +19,6 @@ const createDayListTemplate = (date, dayNumber) => {
         ${dateInfo(date, dayNumber)}
       </div>
       <ul class="trip-events__list">
-
       </ul>
     </li>`
   );

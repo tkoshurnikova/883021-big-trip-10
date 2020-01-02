@@ -1,4 +1,4 @@
-import {MONTHS} from '../utils/common.js';
+import {getMonth} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
 const getTripCost = (card) => {
@@ -35,7 +35,7 @@ const createTripInfoTemplate = (cards) => {
     `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
         <h1 class="trip-info__title">${route}</h1>
-        <p class="trip-info__dates">${MONTHS[cards[0].startDate.getMonth()]} ${cards[0].startDate.getDate()}&nbsp;&mdash;&nbsp;${cards[cards.length - 1].endDate.getDate()}</p>
+        <p class="trip-info__dates">${getMonth(cards[0].startDate)} ${cards[0].startDate.getDate()}&nbsp;&mdash;&nbsp;${cards[cards.length - 1].endDate.getDate()}</p>
       </div>
       <p class="trip-info__cost">
         Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalCost}</span>

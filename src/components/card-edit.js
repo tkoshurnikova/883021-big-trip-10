@@ -1,5 +1,5 @@
 import {EVENTS, DESTINATIONS, OPTIONS} from '../mock/card.js';
-import {formatTime, formatDate, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
+import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 
 const createEventTypeMarkup = (event) => {
@@ -76,12 +76,12 @@ const createCardEditTemplate = (card, options = {}) => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(startDate)} ${formatTime(startDate)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formateDateAndTime(startDate)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(endDate)} ${formatTime(endDate)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formateDateAndTime(endDate)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
