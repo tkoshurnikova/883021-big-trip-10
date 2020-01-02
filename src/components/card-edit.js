@@ -1,6 +1,7 @@
 import {EVENTS, DESTINATIONS, OPTIONS} from '../mock/card.js';
 import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import flatpickr from 'flatpickr';
 
 const createEventTypeMarkup = (event) => {
   return (
@@ -144,6 +145,9 @@ export default class CardEdit extends AbstractSmartComponent {
     this._cardType = card.type;
     this._cardDestination = card.destination;
 
+    this._flatpickr = null;
+    this._applyFlatpickr();
+
     this._subscribeOnEvents();
 
     this._rollUpButtonClickHandler = null;
@@ -183,6 +187,31 @@ export default class CardEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+    this._applyFlatpickr();
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
+    this._setFlatpickr(startDateElement, this._card.startDate, new Date().fp_incr(-14), this._card.endDate);
+
+    const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
+    this._setFlatpickr(endDateElement, this._card.endDate, this._card.startDate, new Date().fp_incr(14));
+  }
+
+  _setFlatpickr(input, defaultDate, minDate, maxDate) {
+    this._flatpickr = flatpickr(input, {
+      enableTime: true,
+      dateFormat: `d/m/y H:i`,
+      allowInput: true,
+      defaultDate,
+      minDate,
+      maxDate,
+    });
   }
 
   _subscribeOnEvents() {
