@@ -3,14 +3,6 @@ const EVENTS = {
   ACTIVITY: [`check-in`, `restaurant`, `sightseeing`]
 };
 
-// const CITIES = [
-//   `Amsterdam`,
-//   `Budapest`,
-//   `Paris`,
-//   `London`,
-//   `Moscow`
-// ];
-
 const DESCRIPTION = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
   `Cras aliquet varius magna, non porta ligula feugiat eget.`,
@@ -88,17 +80,6 @@ const generateArray = (count, element) => {
     .fill(``)
     .map(element);
 };
-
-// const generateDestination = (cities, description) => {
-//   const descriptionSentencesCount = getRandomIntegerNumber(SENTENCES_COUNT_MIN, SENTENCES_COUNT_MAX);
-
-//   const Destination = new Object();
-//   Destination.city = getRandomArrayElement(cities);
-//   Destination.description = getRandomArrayElements(description, descriptionSentencesCount);
-
-//   return Destination;
-//   console.log(Destination)
-// }
 
 const getRandomDate = () => {
   const targetDate = new Date();

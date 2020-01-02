@@ -24,7 +24,11 @@ const createCardTemplate = (card) => {
     let hours = Math.floor(durationInMs / 3600000);
     let minutes = Math.floor((durationInMs % 3600000) / 60000);
     minutes = (minutes > 0) ? minutes : minutes + 60;
-    return `${hours}H ${minutes}M`;
+    if (hours > 23) {
+      return `${Math.floor(hours / 24)}D ${hours % 24}H ${minutes}M`
+    } else {
+      return `${hours}H ${minutes}M`;
+    }
   };
 
   return (
