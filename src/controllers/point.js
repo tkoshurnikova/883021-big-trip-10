@@ -29,7 +29,6 @@ export default class PointController {
 
     this._cardComponent.setEditButtonClickHandler(() => {
       this._replaceCardToEdit();
-      document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
     if (oldCardComponent && oldCardEditComponent) {
@@ -58,9 +57,11 @@ export default class PointController {
     replace(this._cardComponent, this._cardEditComponent);
     this._mode = Mode.DEFAULT;
     this._cardEditComponent.removeElement();
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _setEditCardListeners() {
+    document.addEventListener(`keydown`, this._onEscKeyDown);
     this._cardEditComponent.setRollUpButtonClickHandler(() => this._replaceEditToCard());
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
@@ -79,7 +80,6 @@ export default class PointController {
 
     if (isEscKey) {
       this._replaceEditToCard();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }
 }
