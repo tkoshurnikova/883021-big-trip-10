@@ -1,3 +1,5 @@
+import {EVENTS} from '../mock/card.js';
+
 const MONTHS = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
 
 const castTimeFormat = (value) => {
@@ -31,5 +33,15 @@ const uppercaseFirstLetter = (element) => {
   return element[0].toUpperCase() + element.slice(1);
 };
 
-export {MONTHS, formatTime, formatDate, formatDateForDatetime, uppercaseFirstLetter};
+const getEventTitle = (type) => {
+  let eventTitle;
+  if (EVENTS.ACTIVITY.indexOf(type) !== -1) {
+    eventTitle = uppercaseFirstLetter(type) + ` in `;
+  } else if (EVENTS.TRANSFER.indexOf(type) !== -1) {
+    eventTitle = uppercaseFirstLetter(type) + ` to `;
+  }
+  return eventTitle;
+};
+
+export {MONTHS, formatTime, formatDate, formatDateForDatetime, uppercaseFirstLetter, getEventTitle};
 
