@@ -1,4 +1,4 @@
-import {formatTime, formatDateForDatetime} from '../utils/common.js';
+import {formatTime, formatDateForDatetime, getEventDuration, getEventTitle} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
 const createOffersMarkup = (offers) => {
@@ -19,21 +19,13 @@ const createCardTemplate = (card) => {
   const {type, destination, startDate, endDate, price, options} = card;
   const offers = createOffersMarkup(options);
 
-  const eventDuration = () => {
-    const durationInMs = endDate - startDate;
-    let hours = Math.floor(durationInMs / 3600000);
-    let minutes = Math.floor((durationInMs % 3600000) / 60000);
-    minutes = (minutes > 0) ? minutes : minutes + 60;
-    return `${hours}H ${minutes}M`;
-  };
-
   return (
     `<li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="${type.icon}" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type.name} in ${destination}</h3>
+        <h3 class="event__title">${getEventTitle(type)} ${destination}</h3>
 
         <div class="event__schedule">
           <p class="event__time">
@@ -41,7 +33,7 @@ const createCardTemplate = (card) => {
             &mdash;
             <time class="event__end-time" datetime="${formatDateForDatetime(endDate)}">${formatTime(endDate)}</time>
           </p>
-          <p class="event__duration">${eventDuration()}</p>
+          <p class="event__duration">${getEventDuration(endDate, startDate)}</p>
         </div>
 
         <p class="event__price">

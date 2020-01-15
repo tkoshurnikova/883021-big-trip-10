@@ -1,23 +1,22 @@
-import {EVENTS, CITIES, OPTIONS} from '../mock/card.js';
-import {formatTime, formatDate} from '../utils/common.js';
-import AbstractComponent from './abstract-component.js';
+import {EVENTS, DESTINATIONS, OPTIONS} from '../mock/card.js';
+import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
+import flatpickr from 'flatpickr';
 
 const createEventTypeMarkup = (event) => {
-  const {name} = event;
-
   return (
     `<div class="event__type-item">
-      <input id="event-type-${name.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${name.toLowerCase()}">
-      <label class="event__type-label  event__type-label--${name.toLowerCase()}" for="event-type-${name.toLowerCase()}-1">${name}</label>
+      <input id="event-type-${event}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${event}">
+      <label class="event__type-label  event__type-label--${event}" for="event-type-${event}-1">${uppercaseFirstLetter(event)}</label>
     </div>`
   );
 };
 
-const createEventsFieldsetMarkup = (group, events) => {
+const createEventsFieldsetMarkup = (group) => {
   return (
     `<fieldset class="event__type-group">
       <legend class="visually-hidden">${group}</legend>
-      ${events.filter((event) => event.group === group).map((event) => createEventTypeMarkup(event)).join(`\n`)}
+      ${group.map((element) => createEventTypeMarkup(element)).join(`\n`)}
     </fieldset>`
   );
 };
@@ -37,11 +36,13 @@ const createOfferMarkup = (offer, card) => {
   );
 };
 
-const createCardEditTemplate = (card) => {
-  const {type, destination, photos, description, startDate, endDate, price} = card;
-  const eventGroups = Array.from(new Set(EVENTS.map((event) => event.group)));
-  const events = eventGroups.map((group) => createEventsFieldsetMarkup(group, EVENTS)).join(`\n`);
+const createCardEditTemplate = (card, options = {}) => {
+  const {photos, description, startDate, endDate, price} = card;
+  const {type, destination, isFavorite} = options;
+  const eventGroups = Object.keys(EVENTS);
+  const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group])).join(`\n`);
   const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
+  const isChecked = isFavorite ? `checked` : ``;
 
   return (
     `<form class="event  event--edit" action="#" method="post">
@@ -49,7 +50,7 @@ const createCardEditTemplate = (card) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -60,13 +61,13 @@ const createCardEditTemplate = (card) => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${type.name} at
+            ${getEventTitle(type)}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
           <datalist id="destination-list-1">
-    ${CITIES.map((city) => {
+    ${DESTINATIONS.map((item) => {
       return (
-        `<option value="${city}"></option>`
+        `<option value="${item.city}"></option>`
       );
     }).join(`\n`)}
           </datalist>
@@ -76,12 +77,12 @@ const createCardEditTemplate = (card) => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(startDate)} ${formatTime(startDate)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formateDateAndTime(startDate)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(endDate)} ${formatTime(endDate)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formateDateAndTime(endDate)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -95,7 +96,7 @@ const createCardEditTemplate = (card) => {
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
 
-        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
         <label class="event__favorite-btn" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -137,22 +138,107 @@ const createCardEditTemplate = (card) => {
   );
 };
 
-export default class CardEdit extends AbstractComponent {
+export default class CardEdit extends AbstractSmartComponent {
   constructor(card) {
     super();
     this._card = card;
+    this._cardType = card.type;
+    this._cardDestination = card.destination;
+    this._cardIsFavorite = card.isFavorite;
+
+    this._flatpickr = null;
+    this._applyFlatpickr();
+
+    this._subscribeOnEvents();
+
+    this._rollUpButtonClickHandler = null;
+    this._submitHandler = null;
+    this._favoriteButtonHandler = null;
   }
 
   getTemplate() {
-    return createCardEditTemplate(this._card);
+    return createCardEditTemplate(this._card, {
+      type: this._cardType,
+      destination: this._cardDestination,
+      isFavorite: this._cardIsFavorite
+    });
   }
 
   setRollUpButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`)
       .addEventListener(`click`, handler);
+    this._rollUpButtonClickHandler = handler;
   }
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+    this._submitHandler = handler;
+  }
+
+  setFavoriteButtonHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoriteButtonHandler = handler;
+  }
+
+  recoveryListeners() {
+    this.setRollUpButtonClickHandler(this._rollUpButtonClickHandler);
+    this.setSubmitHandler(this._submitHandler);
+    this.setFavoriteButtonHandler(this._favoriteButtonHandler);
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+    this._applyFlatpickr();
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
+    this._setFlatpickr(startDateElement, this._card.startDate, new Date().fp_incr(-14), this._card.endDate);
+
+    const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
+    this._setFlatpickr(endDateElement, this._card.endDate, this._card.startDate, new Date().fp_incr(14));
+  }
+
+  _setFlatpickr(input, defaultDate, minDate, maxDate) {
+    this._flatpickr = flatpickr(input, {
+      enableTime: true,
+      dateFormat: `d/m/y H:i`,
+      allowInput: true,
+      defaultDate,
+      minDate,
+      maxDate,
+    });
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, (evt) => {
+      this._cardIsFavorite = evt.target.checked;
+      this.rerender();
+    });
+
+    element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
+      if (evt.target.tagName === `INPUT`) {
+        this._cardType = evt.target.value;
+        this.rerender();
+      }
+    });
+
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      DESTINATIONS.forEach((destination) => {
+        if (this._cardDestination === destination.city) {
+          this._cardDestination = evt.target.value;
+          this._card.description = destination.description;
+          this.rerender();
+        }
+      });
+    });
   }
 }
