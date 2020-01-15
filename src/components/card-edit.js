@@ -37,8 +37,8 @@ const createOfferMarkup = (offer, card) => {
 };
 
 const createCardEditTemplate = (card, options = {}) => {
-  const {photos, description, startDate, endDate, price, isFavorite} = card;
-  const {type, destination} = options;
+  const {photos, description, startDate, endDate, price} = card;
+  const {type, destination, isFavorite} = options;
   const eventGroups = Object.keys(EVENTS);
   const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group])).join(`\n`);
   const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
@@ -144,6 +144,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._card = card;
     this._cardType = card.type;
     this._cardDestination = card.destination;
+    this._cardIsFavorite = card.isFavorite;
 
     this._flatpickr = null;
     this._applyFlatpickr();
@@ -158,7 +159,8 @@ export default class CardEdit extends AbstractSmartComponent {
   getTemplate() {
     return createCardEditTemplate(this._card, {
       type: this._cardType,
-      destination: this._cardDestination
+      destination: this._cardDestination,
+      isFavorite: this._cardIsFavorite
     });
   }
 
@@ -173,7 +175,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._submitHandler = handler;
   }
 
-  setFavouriteButtonHandler(handler) {
+  setFavoriteButtonHandler(handler) {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
     this._favoriteButtonHandler = handler;
   }
@@ -181,7 +183,7 @@ export default class CardEdit extends AbstractSmartComponent {
   recoveryListeners() {
     this.setRollUpButtonClickHandler(this._rollUpButtonClickHandler);
     this.setSubmitHandler(this._submitHandler);
-    this.setFavouriteButtonHandler(this._favoriteButtonHandler);
+    this.setFavoriteButtonHandler(this._favoriteButtonHandler);
     this._subscribeOnEvents();
   }
 
@@ -216,6 +218,11 @@ export default class CardEdit extends AbstractSmartComponent {
 
   _subscribeOnEvents() {
     const element = this.getElement();
+
+    element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, (evt) => {
+      this._cardIsFavorite = evt.target.checked;
+      this.rerender();
+    });
 
     element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
       if (evt.target.tagName === `INPUT`) {
