@@ -221,6 +221,7 @@ export default class CardEdit extends AbstractSmartComponent {
 
     element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, (evt) => {
       this._cardIsFavorite = evt.target.checked;
+      this.rerender();
     });
 
     element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {

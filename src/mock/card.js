@@ -133,6 +133,7 @@ const generateCard = () => {
   const destination = getRandomArrayElement(DESTINATIONS);
 
   return {
+    id: String(new Date() + Math.random()),
     type: (Math.random() > 0.5) ? getRandomArrayElement(EVENTS.TRANSFER) : getRandomArrayElement(EVENTS.ACTIVITY),
     destination: destination.city,
     photos: generateArray(photosCount, generatePhoto),
