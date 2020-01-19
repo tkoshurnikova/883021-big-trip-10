@@ -8,11 +8,14 @@ import TripController from './controllers/trip.js';
 import {generateCards} from './mock/card.js';
 import {render, RenderPosition} from './utils/render.js';
 
-
 const CARDS_COUNT = 4;
 
 const siteHeaderElement = document.querySelector(`.trip-main__trip-controls`);
-render(siteHeaderElement, new SiteMenuComponent(), RenderPosition.AFTERBEGIN);
+const siteMenuComponent = new SiteMenuComponent();
+document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
+  tripContoller.createCard();
+});
+render(siteHeaderElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
 
 const cardsListSection = document.querySelector(`.trip-events`);
 const cards = generateCards(CARDS_COUNT);

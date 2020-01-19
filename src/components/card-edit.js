@@ -2,6 +2,7 @@ import {EVENTS, DESTINATIONS, OPTIONS} from '../mock/card.js';
 import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import flatpickr from 'flatpickr';
+import moment from 'moment';
 
 const createEventTypeMarkup = (event) => {
   return (
@@ -138,6 +139,7 @@ const createCardEditTemplate = (card, options = {}) => {
   );
 };
 
+
 export default class CardEdit extends AbstractSmartComponent {
   constructor(card) {
     super();
@@ -154,6 +156,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._rollUpButtonClickHandler = null;
     this._submitHandler = null;
     this._favoriteButtonHandler = null;
+    this._deleteButtonClickHandler = null;
   }
 
   getTemplate() {
@@ -162,6 +165,44 @@ export default class CardEdit extends AbstractSmartComponent {
       destination: this._cardDestination,
       isFavorite: this._cardIsFavorite
     });
+  }
+
+  removeElement() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+    super.removeElement();
+  }
+
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+    const photos = Array.from(form.querySelectorAll(`.event__photo`)).map((photo) => {
+      return {src: photo.src, description: photo.alt};
+    });
+
+    const optionsChecked = Array.from(form.querySelectorAll(`.event__offer-checkbox`))
+      .filter((input) => input.checked)
+      .map((input) => {
+        return {
+          title: input.parentElement.querySelector(`.event__offer-title`).textContent,
+          price: parseInt(input.parentElement.querySelector(`.event__offer-price`).textContent, 10)
+        };
+      });
+
+    return {
+      type: formData.get(`event-type`),
+      destination: formData.get(`event-destination`),
+      photos,
+      description: form.querySelector(`.event__destination-description`).textContent,
+      startDate: moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`).valueOf(),
+      endDate: moment(formData.get(`event-end-time`), `DD/MM/YY HH:mm`).valueOf(),
+      price: parseInt(formData.get(`event-price`), 10),
+      options: optionsChecked,
+      isFavorite: form.querySelector(`.event__favorite-checkbox`) ? form.querySelector(`.event__favorite-checkbox`).checked : false
+    };
   }
 
   setRollUpButtonClickHandler(handler) {
@@ -178,6 +219,11 @@ export default class CardEdit extends AbstractSmartComponent {
   setFavoriteButtonHandler(handler) {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
     this._favoriteButtonHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._deleteButtonClickHandler = handler;
   }
 
   recoveryListeners() {

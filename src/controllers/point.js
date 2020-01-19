@@ -1,10 +1,23 @@
 import CardComponent from '../components/card.js';
 import CardEditComponent from '../components/card-edit.js';
-import {render, replace, RenderPosition} from '../utils/render.js';
+import {render, replace, remove, RenderPosition} from '../utils/render.js';
 
-const Mode = {
+export const Mode = {
+  ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`,
+};
+
+export const EmptyCard = {
+  type: `trip`,
+  destination: ``,
+  photos: [],
+  description: ``,
+  startDate: ``,
+  endDate: ``,
+  price: ``,
+  options: [],
+  isFavorite: false
 };
 
 export default class PointController {
@@ -19,8 +32,10 @@ export default class PointController {
     this._card = null;
   }
 
-  render(card) {
+  render(card, mode) {
     this._card = card;
+    this._mode = mode;
+
     const oldCardComponent = this._cardComponent;
     const oldCardEditComponent = this._cardEditComponent;
 
@@ -31,11 +46,23 @@ export default class PointController {
       this._replaceCardToEdit();
     });
 
-    if (oldCardComponent && oldCardEditComponent) {
-      replace(this._cardComponent, oldCardComponent);
-      replace(this._cardEditComponent, oldCardEditComponent);
-    } else {
-      render(container, this._cardComponent, RenderPosition.BEFOREEND);
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldCardComponent && oldCardEditComponent) {
+          replace(this._cardComponent, oldCardComponent);
+          replace(this._cardEditComponent, oldCardEditComponent);
+        } else {
+          render(container, this._cardComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+      case Mode.ADDING:
+        if (oldCardComponent && oldCardEditComponent) {
+          remove(oldCardComponent);
+          remove(oldCardEditComponent);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        render(container, new CardEditComponent(this._card), RenderPosition.AFTERBEGIN);
+        break;
     }
   }
 
@@ -43,6 +70,11 @@ export default class PointController {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToCard();
     }
+  }
+
+  destroy() {
+    remove(this._cardComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _replaceCardToEdit() {
@@ -62,11 +94,16 @@ export default class PointController {
 
   _setEditCardListeners() {
     document.addEventListener(`keydown`, this._onEscKeyDown);
+
     this._cardEditComponent.setRollUpButtonClickHandler(() => this._replaceEditToCard());
+
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._replaceEditToCard();
+      const data = this._cardEditComponent.getData();
+      this._onDataChange(this, this._card, data);
     });
+
+    this._cardEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, this._card, null));
 
     this._cardEditComponent.setFavoriteButtonHandler(() => {
       this._onDataChange(this, this._card, Object.assign({}, this._card, {
@@ -79,6 +116,9 @@ export default class PointController {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
     if (isEscKey) {
+      if (this._mode === Mode.ADDING) {
+        this._onDataChange(this, EmptyCard, null);
+      }
       this._replaceEditToCard();
     }
   }

@@ -42,6 +42,8 @@ const getEventTitle = (type) => {
     eventTitle = uppercaseFirstLetter(type) + ` in `;
   } else if (EVENTS.TRANSFER.indexOf(type) !== -1) {
     eventTitle = uppercaseFirstLetter(type) + ` to `;
+  } else if (type === `trip`) {
+    eventTitle = ``;
   }
   return eventTitle;
 };
