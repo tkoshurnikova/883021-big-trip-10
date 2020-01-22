@@ -1,30 +1,32 @@
-import {EVENTS, DESTINATIONS, OPTIONS} from '../mock/card.js';
+import {EVENTS, DESTINATIONS, OFFERS} from '../mock/card.js';
 import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import flatpickr from 'flatpickr';
 import moment from 'moment';
 
-const createEventTypeMarkup = (event) => {
+const createEventTypeMarkup = (event, type) => {
+  const isChecked = (type === event) ? `checked` : ``;
+
   return (
     `<div class="event__type-item">
-      <input id="event-type-${event}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${event}">
+      <input id="event-type-${event}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${event}" ${isChecked}>
       <label class="event__type-label  event__type-label--${event}" for="event-type-${event}-1">${uppercaseFirstLetter(event)}</label>
     </div>`
   );
 };
 
-const createEventsFieldsetMarkup = (group) => {
+const createEventsFieldsetMarkup = (group, type) => {
   return (
     `<fieldset class="event__type-group">
       <legend class="visually-hidden">${group}</legend>
-      ${group.map((element) => createEventTypeMarkup(element)).join(`\n`)}
+      ${group.map((element) => createEventTypeMarkup(element, type)).join(`\n`)}
     </fieldset>`
   );
 };
 
-const createOfferMarkup = (offer, card) => {
-  const {options} = card;
-  const check = (options.indexOf(offer) !== -1) ? `checked` : ``;
+const createOfferMarkup = (offer, offers) => {
+  const check = (offers.indexOf(offer) !== -1) ? `checked` : ``;
+
   return (
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${check}>
@@ -39,10 +41,10 @@ const createOfferMarkup = (offer, card) => {
 
 const createCardEditTemplate = (card, options = {}) => {
   const {photos, description, startDate, endDate, price} = card;
-  const {type, destination, isFavorite} = options;
+  const {type, destination, isFavorite, offers} = options;
   const eventGroups = Object.keys(EVENTS);
-  const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group])).join(`\n`);
-  const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
+  const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group], type)).join(`\n`);
+  const offersMarkup = OFFERS.map((offer) => createOfferMarkup(offer, offers)).join(`\n`);
   const isChecked = isFavorite ? `checked` : ``;
 
   return (
@@ -116,7 +118,7 @@ const createCardEditTemplate = (card, options = {}) => {
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
-           ${offers}
+           ${offersMarkup}
           </div>
         </section>
 
@@ -147,6 +149,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._cardType = card.type;
     this._cardDestination = card.destination;
     this._cardIsFavorite = card.isFavorite;
+    this._cardOffers = card.offers;
 
     this._flatpickr = null;
     this._applyFlatpickr();
@@ -163,7 +166,8 @@ export default class CardEdit extends AbstractSmartComponent {
     return createCardEditTemplate(this._card, {
       type: this._cardType,
       destination: this._cardDestination,
-      isFavorite: this._cardIsFavorite
+      isFavorite: this._cardIsFavorite,
+      offers: this._cardOffers
     });
   }
 
@@ -180,14 +184,14 @@ export default class CardEdit extends AbstractSmartComponent {
     const formData = new FormData(form);
 
     const photos = Array.from(form.querySelectorAll(`.event__photo`)).map((photo) => {
-      return {src: photo.src, description: photo.alt};
+      return photo.src;
     });
 
-    const optionsChecked = Array.from(form.querySelectorAll(`.event__offer-checkbox`))
+    const offersChecked = Array.from(form.querySelectorAll(`.event__offer-checkbox`))
       .filter((input) => input.checked)
       .map((input) => {
         return {
-          title: input.parentElement.querySelector(`.event__offer-title`).textContent,
+          name: input.parentElement.querySelector(`.event__offer-title`).textContent,
           price: parseInt(input.parentElement.querySelector(`.event__offer-price`).textContent, 10)
         };
       });
@@ -200,7 +204,7 @@ export default class CardEdit extends AbstractSmartComponent {
       startDate: moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`).valueOf(),
       endDate: moment(formData.get(`event-end-time`), `DD/MM/YY HH:mm`).valueOf(),
       price: parseInt(formData.get(`event-price`), 10),
-      options: optionsChecked,
+      offers: offersChecked,
       isFavorite: form.querySelector(`.event__favorite-checkbox`) ? form.querySelector(`.event__favorite-checkbox`).checked : false
     };
   }

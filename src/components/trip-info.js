@@ -2,8 +2,8 @@ import {getMonth} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
 const getTripCost = (card) => {
-  const {price, options} = card;
-  const tripCost = options.map((option) => option.price).reduce((sum, current) => {
+  const {price, offers} = card;
+  const tripCost = offers.map((option) => option.price).reduce((sum, current) => {
     return sum + current;
   }, price);
   return tripCost;

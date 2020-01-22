@@ -16,7 +16,7 @@ export const EmptyCard = {
   startDate: ``,
   endDate: ``,
   price: ``,
-  options: [],
+  offers: [],
   isFavorite: false
 };
 
@@ -60,8 +60,10 @@ export default class PointController {
           remove(oldCardComponent);
           remove(oldCardEditComponent);
         }
+        this._cardEditComponent = new CardEditComponent(this._card);
         document.addEventListener(`keydown`, this._onEscKeyDown);
-        render(container, new CardEditComponent(this._card), RenderPosition.AFTERBEGIN);
+        render(container, this._cardEditComponent, RenderPosition.AFTERBEGIN);
+        this._setEditCardListeners();
         break;
     }
   }
@@ -95,12 +97,19 @@ export default class PointController {
   _setEditCardListeners() {
     document.addEventListener(`keydown`, this._onEscKeyDown);
 
-    this._cardEditComponent.setRollUpButtonClickHandler(() => this._replaceEditToCard());
+    this._cardEditComponent.setRollUpButtonClickHandler(() => {
+      if (this._mode === Mode.ADDING) {
+        this._onDataChange(this, EmptyCard, null);
+      } else {
+        this._replaceEditToCard();
+      }
+    });
 
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
       const data = this._cardEditComponent.getData();
       this._onDataChange(this, this._card, data);
+      this._replaceEditToCard();
     });
 
     this._cardEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, this._card, null));
@@ -118,8 +127,9 @@ export default class PointController {
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
         this._onDataChange(this, EmptyCard, null);
+      } else {
+        this._replaceEditToCard();
       }
-      this._replaceEditToCard();
     }
   }
 }

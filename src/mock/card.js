@@ -17,7 +17,7 @@ const DESCRIPTION = [
   `In rutrum ac purus sit amet tempus.`
 ];
 
-const OPTIONS = [
+const OFFERS = [
   {
     type: `luggage`,
     name: `Add luggage`,
@@ -49,8 +49,8 @@ const PHOTO_COUNT_MIN = 1;
 const PHOTO_COUNT_MAX = 4;
 const SENTENCES_COUNT_MIN = 1;
 const SENTENCES_COUNT_MAX = 3;
-const OPTIONS_COUNT_MIN = 0;
-const OPTIONS_COUNT_MAX = 2;
+const OFFERS_COUNT_MIN = 0;
+const OFFERS_COUNT_MAX = 2;
 const PRICE_MIN = 0;
 const PRICE_MAX = 1000;
 
@@ -125,7 +125,7 @@ const DESTINATIONS = [
 
 const generateCard = () => {
   const photosCount = getRandomIntegerNumber(PHOTO_COUNT_MIN, PHOTO_COUNT_MAX);
-  const optionsCount = getRandomIntegerNumber(OPTIONS_COUNT_MIN, OPTIONS_COUNT_MAX);
+  const offersCount = getRandomIntegerNumber(OFFERS_COUNT_MIN, OFFERS_COUNT_MAX);
   const firstRandomDate = getRandomDate();
   const secondRandomDate = getRandomDate();
   const startDate = (firstRandomDate < secondRandomDate) ? firstRandomDate : secondRandomDate;
@@ -141,7 +141,7 @@ const generateCard = () => {
     startDate,
     endDate,
     price: getRandomIntegerNumber(PRICE_MIN, PRICE_MAX),
-    options: Array.from(new Set(getRandomArrayElements(OPTIONS, optionsCount))),
+    offers: Array.from(new Set(getRandomArrayElements(OFFERS, offersCount))),
     isFavorite: Math.random() > 0.5
   };
 };
@@ -152,4 +152,4 @@ const generateCards = (count) => {
     .map(generateCard);
 };
 
-export {generateCards, EVENTS, DESTINATIONS, OPTIONS};
+export {generateCards, EVENTS, DESTINATIONS, OFFERS};
