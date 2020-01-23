@@ -9,7 +9,7 @@ export const Mode = {
 };
 
 export const EmptyCard = {
-  type: `trip`,
+  type: `bus`,
   destination: ``,
   photos: [],
   description: ``,
@@ -60,7 +60,7 @@ export default class PointController {
           remove(oldCardComponent);
           remove(oldCardEditComponent);
         }
-        this._cardEditComponent = new CardEditComponent(this._card);
+        this._cardEditComponent = new CardEditComponent(this._card, Mode.ADDING);
         document.addEventListener(`keydown`, this._onEscKeyDown);
         render(container, this._cardEditComponent, RenderPosition.AFTERBEGIN);
         this._setEditCardListeners();
@@ -97,13 +97,17 @@ export default class PointController {
   _setEditCardListeners() {
     document.addEventListener(`keydown`, this._onEscKeyDown);
 
-    this._cardEditComponent.setRollUpButtonClickHandler(() => {
-      if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EmptyCard, null);
-      } else {
+    if (this._mode !== Mode.ADDING) {
+      this._cardEditComponent.setRollUpButtonClickHandler(() => {
         this._replaceEditToCard();
-      }
-    });
+      });
+
+      this._cardEditComponent.setFavoriteButtonHandler(() => {
+        this._onDataChange(this, this._card, Object.assign({}, this._card, {
+          isFavorite: !this._card.isFavorite
+        }));
+      });
+    }
 
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
@@ -113,12 +117,6 @@ export default class PointController {
     });
 
     this._cardEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, this._card, null));
-
-    this._cardEditComponent.setFavoriteButtonHandler(() => {
-      this._onDataChange(this, this._card, Object.assign({}, this._card, {
-        isFavorite: !this._card.isFavorite
-      }));
-    });
   }
 
   _onEscKeyDown(evt) {

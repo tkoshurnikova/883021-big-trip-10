@@ -1,6 +1,7 @@
 import {EVENTS, DESTINATIONS, OFFERS} from '../mock/card.js';
 import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import {Mode as PointControllerMode} from '../controllers/point.js';
 import flatpickr from 'flatpickr';
 import moment from 'moment';
 
@@ -39,7 +40,7 @@ const createOfferMarkup = (offer, offers) => {
   );
 };
 
-const createCardEditTemplate = (card, options = {}) => {
+const createCardEditTemplate = (card, options = {}, mode) => {
   const {photos, description, startDate, endDate, price} = card;
   const {type, destination, isFavorite, offers} = options;
   const eventGroups = Object.keys(EVENTS);
@@ -99,20 +100,25 @@ const createCardEditTemplate = (card, options = {}) => {
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
 
-        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
-        <label class="event__favorite-btn" for="event-favorite-1">
-          <span class="visually-hidden">Add to favorite</span>
-          <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-            <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-          </svg>
-        </label>
+        ${mode === PointControllerMode.ADDING ? `` :
 
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+      `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
+          <label class="event__favorite-btn" for="event-favorite-1">
+            <span class="visually-hidden">Add to favorite</span>
+            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+            </svg>
+          </label>
+
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>`
+    }
       </header>
 
-      <section class="event__details">
+      ${(destination === `` && mode === PointControllerMode.ADDING) ? `` :
+
+      `<section class="event__details">
 
         <section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -121,6 +127,7 @@ const createCardEditTemplate = (card, options = {}) => {
            ${offersMarkup}
           </div>
         </section>
+
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -136,16 +143,18 @@ const createCardEditTemplate = (card, options = {}) => {
             </div>
           </div>
         </section>
-      </section>
+      </section>`
+    }
     </form>`
   );
 };
 
 
 export default class CardEdit extends AbstractSmartComponent {
-  constructor(card) {
+  constructor(card, mode) {
     super();
     this._card = card;
+    this._mode = mode;
     this._cardType = card.type;
     this._cardDestination = card.destination;
     this._cardIsFavorite = card.isFavorite;
@@ -168,7 +177,7 @@ export default class CardEdit extends AbstractSmartComponent {
       destination: this._cardDestination,
       isFavorite: this._cardIsFavorite,
       offers: this._cardOffers
-    });
+    }, this._mode);
   }
 
   removeElement() {
@@ -269,10 +278,12 @@ export default class CardEdit extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const element = this.getElement();
 
-    element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, (evt) => {
-      this._cardIsFavorite = evt.target.checked;
-      this.rerender();
-    });
+    if (this._mode !== PointControllerMode.ADDING) {
+      element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, (evt) => {
+        this._cardIsFavorite = evt.target.checked;
+        this.rerender();
+      });
+    }
 
     element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
       if (evt.target.tagName === `INPUT`) {
