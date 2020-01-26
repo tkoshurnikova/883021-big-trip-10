@@ -16,8 +16,8 @@ const createOffersMarkup = (offers) => {
 };
 
 const createCardTemplate = (card) => {
-  const {type, destination, startDate, endDate, price, options} = card;
-  const offers = createOffersMarkup(options);
+  const {type, destination, startDate, endDate, price, offers} = card;
+  const offersMarkup = createOffersMarkup(offers);
 
   return (
     `<li class="trip-events__item">
@@ -42,7 +42,7 @@ const createCardTemplate = (card) => {
 
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          ${offers}
+          ${offersMarkup}
         </ul>
 
         <button class="event__rollup-btn" type="button">

@@ -1,29 +1,33 @@
-import {EVENTS, DESTINATIONS, OPTIONS} from '../mock/card.js';
+import {EVENTS, DESTINATIONS, OFFERS} from '../mock/card.js';
 import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import {Mode as PointControllerMode} from '../controllers/point.js';
 import flatpickr from 'flatpickr';
+import moment from 'moment';
 
-const createEventTypeMarkup = (event) => {
+const createEventTypeMarkup = (event, type) => {
+  const isChecked = (type === event) ? `checked` : ``;
+
   return (
     `<div class="event__type-item">
-      <input id="event-type-${event}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${event}">
+      <input id="event-type-${event}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${event}" ${isChecked}>
       <label class="event__type-label  event__type-label--${event}" for="event-type-${event}-1">${uppercaseFirstLetter(event)}</label>
     </div>`
   );
 };
 
-const createEventsFieldsetMarkup = (group) => {
+const createEventsFieldsetMarkup = (group, type) => {
   return (
     `<fieldset class="event__type-group">
       <legend class="visually-hidden">${group}</legend>
-      ${group.map((element) => createEventTypeMarkup(element)).join(`\n`)}
+      ${group.map((element) => createEventTypeMarkup(element, type)).join(`\n`)}
     </fieldset>`
   );
 };
 
-const createOfferMarkup = (offer, card) => {
-  const {options} = card;
-  const check = (options.indexOf(offer) !== -1) ? `checked` : ``;
+const createOfferMarkup = (offer, offers) => {
+  const check = (offers.indexOf(offer) !== -1) ? `checked` : ``;
+
   return (
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${check}>
@@ -36,12 +40,12 @@ const createOfferMarkup = (offer, card) => {
   );
 };
 
-const createCardEditTemplate = (card, options = {}) => {
-  const {photos, description, startDate, endDate, price} = card;
-  const {type, destination, isFavorite} = options;
+const createCardEditTemplate = (card, options = {}, mode) => {
+  const {photos, description} = card;
+  const {type, destination, startDate, endDate, price, offers, isFavorite} = options;
   const eventGroups = Object.keys(EVENTS);
-  const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group])).join(`\n`);
-  const offers = OPTIONS.map((option) => createOfferMarkup(option, card)).join(`\n`);
+  const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group], type)).join(`\n`);
+  const offersMarkup = OFFERS.map((offer) => createOfferMarkup(offer, offers)).join(`\n`);
   const isChecked = isFavorite ? `checked` : ``;
 
   return (
@@ -63,7 +67,7 @@ const createCardEditTemplate = (card, options = {}) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${getEventTitle(type)}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1" required>
           <datalist id="destination-list-1">
     ${DESTINATIONS.map((item) => {
       return (
@@ -90,34 +94,40 @@ const createCardEditTemplate = (card, options = {}) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" required>
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
 
-        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
-        <label class="event__favorite-btn" for="event-favorite-1">
-          <span class="visually-hidden">Add to favorite</span>
-          <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-            <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-          </svg>
-        </label>
+        ${mode === PointControllerMode.ADDING ? `` :
 
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+      `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
+          <label class="event__favorite-btn" for="event-favorite-1">
+            <span class="visually-hidden">Add to favorite</span>
+            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+            </svg>
+          </label>
+
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>`
+    }
       </header>
 
-      <section class="event__details">
+      ${(destination === `` && mode === PointControllerMode.ADDING) ? `` :
+
+      `<section class="event__details">
 
         <section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
-           ${offers}
+           ${offersMarkup}
           </div>
         </section>
+
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -133,18 +143,26 @@ const createCardEditTemplate = (card, options = {}) => {
             </div>
           </div>
         </section>
-      </section>
+      </section>`
+    }
     </form>`
   );
 };
 
+
 export default class CardEdit extends AbstractSmartComponent {
-  constructor(card) {
+  constructor(card, mode) {
     super();
     this._card = card;
+    this._mode = mode;
+
     this._cardType = card.type;
     this._cardDestination = card.destination;
     this._cardIsFavorite = card.isFavorite;
+    this._cardOffers = card.offers;
+    this._cardPrice = card.price;
+    this._cardStartDate = card.startDate;
+    this._cardEndDate = card.endDate;
 
     this._flatpickr = null;
     this._applyFlatpickr();
@@ -153,21 +171,66 @@ export default class CardEdit extends AbstractSmartComponent {
 
     this._rollUpButtonClickHandler = null;
     this._submitHandler = null;
-    this._favoriteButtonHandler = null;
+    this._favoriteButtonClickHandler = null;
+    this._deleteButtonClickHandler = null;
   }
 
   getTemplate() {
     return createCardEditTemplate(this._card, {
       type: this._cardType,
       destination: this._cardDestination,
+      startDate: this._cardStartDate,
+      endDate: this._cardEndDate,
+      price: this._cardPrice,
+      offers: this._cardOffers,
       isFavorite: this._cardIsFavorite
+    }, this._mode);
+  }
+
+  removeElement() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+    super.removeElement();
+  }
+
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+    const photos = Array.from(form.querySelectorAll(`.event__photo`)).map((photo) => {
+      return photo.src;
     });
+
+    const offersChecked = Array.from(form.querySelectorAll(`.event__offer-checkbox`))
+      .filter((input) => input.checked)
+      .map((input) => {
+        return {
+          name: input.parentElement.querySelector(`.event__offer-title`).textContent,
+          price: parseInt(input.parentElement.querySelector(`.event__offer-price`).textContent, 10)
+        };
+      });
+
+    return {
+      type: formData.get(`event-type`),
+      destination: formData.get(`event-destination`),
+      photos,
+      description: form.querySelector(`.event__destination-description`).textContent,
+      startDate: new Date(moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`)),
+      endDate: new Date(moment(formData.get(`event-end-time`), `DD/MM/YY HH:mm`)),
+      price: parseInt(formData.get(`event-price`), 10),
+      offers: offersChecked,
+      isFavorite: form.querySelector(`.event__favorite-checkbox`) ? form.querySelector(`.event__favorite-checkbox`).checked : false
+    };
   }
 
   setRollUpButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, handler);
-    this._rollUpButtonClickHandler = handler;
+    if (this._mode !== PointControllerMode.ADDING) {
+      this.getElement().querySelector(`.event__rollup-btn`)
+        .addEventListener(`click`, handler);
+      this._rollUpButtonClickHandler = handler;
+    }
   }
 
   setSubmitHandler(handler) {
@@ -175,15 +238,22 @@ export default class CardEdit extends AbstractSmartComponent {
     this._submitHandler = handler;
   }
 
-  setFavoriteButtonHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
-    this._favoriteButtonHandler = handler;
+  setFavoriteButtonClickHandler(handler) {
+    if (this._mode !== PointControllerMode.ADDING) {
+      this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+      this._favoriteButtonHandler = handler;
+    }
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._deleteButtonClickHandler = handler;
   }
 
   recoveryListeners() {
     this.setRollUpButtonClickHandler(this._rollUpButtonClickHandler);
     this.setSubmitHandler(this._submitHandler);
-    this.setFavoriteButtonHandler(this._favoriteButtonHandler);
+    this.setFavoriteButtonClickHandler(this._favoriteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -199,10 +269,10 @@ export default class CardEdit extends AbstractSmartComponent {
     }
 
     const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
-    this._setFlatpickr(startDateElement, this._card.startDate, new Date().fp_incr(-14), this._card.endDate);
+    this._setFlatpickr(startDateElement, this._cardStartDate, new Date().fp_incr(-14), this._cardEndDate);
 
     const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
-    this._setFlatpickr(endDateElement, this._card.endDate, this._card.startDate, new Date().fp_incr(14));
+    this._setFlatpickr(endDateElement, this._cardEndDate, this._cardStartDate, new Date().fp_incr(14));
   }
 
   _setFlatpickr(input, defaultDate, minDate, maxDate) {
@@ -219,10 +289,12 @@ export default class CardEdit extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const element = this.getElement();
 
-    element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, (evt) => {
-      this._cardIsFavorite = evt.target.checked;
-      this.rerender();
-    });
+    if (this._mode !== PointControllerMode.ADDING) {
+      element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, (evt) => {
+        this._cardIsFavorite = evt.target.checked;
+        this.rerender();
+      });
+    }
 
     element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
       if (evt.target.tagName === `INPUT`) {
@@ -231,9 +303,24 @@ export default class CardEdit extends AbstractSmartComponent {
       }
     });
 
+    element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
+      this._cardPrice = evt.target.value;
+      this.rerender();
+    });
+
+    element.querySelector(`#event-start-time-1`).addEventListener(`change`, (evt) => {
+      this._cardStartDate = evt.target.value;
+      this.rerender();
+    });
+
+    element.querySelector(`#event-end-time-1`).addEventListener(`change`, (evt) => {
+      this._cardEndDate = evt.target.value;
+      this.rerender();
+    });
+
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
       DESTINATIONS.forEach((destination) => {
-        if (this._cardDestination === destination.city) {
+        if (evt.target.value === destination.city) {
           this._cardDestination = evt.target.value;
           this._card.description = destination.description;
           this.rerender();
