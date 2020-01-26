@@ -85,6 +85,7 @@ export default class TripController {
   }
 
   createCard() {
+    this._onViewChange();
     if (this._creatingCard) {
       return;
     }
@@ -172,6 +173,10 @@ export default class TripController {
 
   _onViewChange() {
     this._pointControllers.forEach((item) => item.setDefaultView());
+    if (this._creatingCard) {
+      this._creatingCard.destroy();
+      this._creatingCard = null;
+    }
   }
 
   _onFilterChange() {

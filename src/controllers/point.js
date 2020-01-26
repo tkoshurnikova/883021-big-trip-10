@@ -13,8 +13,8 @@ export const EmptyCard = {
   destination: ``,
   photos: [],
   description: ``,
-  startDate: ``,
-  endDate: ``,
+  startDate: new Date(),
+  endDate: new Date(),
   price: ``,
   offers: [],
   isFavorite: false
@@ -77,6 +77,9 @@ export default class PointController {
   destroy() {
     remove(this._cardComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+    if (this._cardEditComponent) {
+      remove(this._cardEditComponent);
+    }
   }
 
   _replaceCardToEdit() {
@@ -102,7 +105,7 @@ export default class PointController {
         this._replaceEditToCard();
       });
 
-      this._cardEditComponent.setFavoriteButtonHandler(() => {
+      this._cardEditComponent.setFavoriteButtonClickHandler(() => {
         this._onDataChange(this, this._card, Object.assign({}, this._card, {
           isFavorite: !this._card.isFavorite
         }));
