@@ -29,6 +29,14 @@ export default class TripController {
     this._pointControllers = [];
   }
 
+  hide() {
+    this._container.classList.add(`visually-hidden`);
+  }
+
+  show() {
+    this._container.classList.remove(`visually-hidden`);
+  }
+
   render() {
     const container = this._container;
     const cards = this._cardsModel.getCards();
