@@ -35,7 +35,7 @@ export default class SiteMenu extends AbstractComponent {
       }
 
       const menuItem = evt.target.id;
-      this.setActiveItem(menuItem)
+      this.setActiveItem(menuItem);
       handler(menuItem);
     });
   }

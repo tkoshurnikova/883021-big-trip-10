@@ -141,8 +141,6 @@ const renderChart = (ctx, data, barName) => {
   });
 };
 
-const calculateTimeIntervalInHours = (time1, time2) => moment(time2).diff(moment(time1), `hours`);
-
 const getFilteredCardsForStats = (cards) => {
   const filteredCards = [];
   const cardTypes = new Set(cards.map((card) => card.type));
@@ -157,7 +155,8 @@ const getFilteredCardsForStats = (cards) => {
       totalTime: filteredCardsByType.reduce((totalTime, item) => totalTime + moment(item.endDate).diff(moment(item.startDate), `hours`), 0),
       isTransport: EVENTS.TRANSFER.some((item) => cardType === item)
     });
-  })
+  });
+
   return filteredCards;
 };
 
