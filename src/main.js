@@ -1,7 +1,8 @@
 import CardsModel from './models/cards.js';
 
 import FilterController from './controllers/filter.js';
-import SiteMenuComponent from './components/site-menu.js';
+import SiteMenuComponent, {MenuItem} from './components/site-menu.js';
+import StatsComponent from './components/stats.js';
 
 import TripController from './controllers/trip.js';
 
@@ -28,3 +29,21 @@ filterController.render();
 
 const tripContoller = new TripController(cardsListSection, cardsModel);
 tripContoller.render();
+
+const siteMainElement = document.querySelector(`.page-main`);
+const statsComponent = new StatsComponent(cardsModel);
+render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
+statsComponent.hide();
+
+siteMenuComponent.setOnChange((menuItem) => {
+  switch (menuItem) {
+    case MenuItem.STATS:
+      tripContoller.hide();
+      statsComponent.show();
+      break;
+    case MenuItem.TABLE:
+      statsComponent.hide();
+      tripContoller.show();
+      break;
+  }
+});
