@@ -26,7 +26,10 @@ const createEventsFieldsetMarkup = (group, type) => {
 };
 
 const createOfferMarkup = (offer, offers) => {
-  const check = (offers.indexOf(offer) !== -1) ? `checked` : ``;
+  const isChecked = offers.findIndex((item) => {
+    return item.name === offer.name;
+  });
+  const check = (isChecked === -1) ? `` : `checked`;
 
   return (
     `<div class="event__offer-selector">

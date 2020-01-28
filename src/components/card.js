@@ -2,6 +2,11 @@ import {formatTime, formatDateForDatetime, getEventDuration, getEventTitle} from
 import AbstractComponent from './abstract-component.js';
 
 const createOffersMarkup = (offers) => {
+
+  if (offers.length > 3) {
+    offers = offers.slice(2);
+  }
+
   return offers
     .map(({name, price}) => {
       return (

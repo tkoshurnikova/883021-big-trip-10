@@ -31,7 +31,7 @@ const tripContoller = new TripController(cardsListSection, cardsModel);
 tripContoller.render();
 
 const siteMainElement = document.querySelector(`.page-main`);
-const statsComponent = new StatsComponent(cardsModel.getCardsAll());
+const statsComponent = new StatsComponent(cardsModel);
 render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
 statsComponent.hide();
 

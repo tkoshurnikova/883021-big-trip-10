@@ -209,7 +209,7 @@ export default class Stats extends AbstractSmartComponent {
   _renderCharts() {
     const element = this.getElement();
 
-    const filteredCardsForStats = getFilteredCardsForStats(this._cards);
+    const filteredCardsForStats = getFilteredCardsForStats(this._cards.getCardsAll());
 
     const moneyCtx = element.querySelector(`.statistics__chart--money`);
     const transportCtx = element.querySelector(`.statistics__chart--transport`);
