@@ -1,23 +1,27 @@
 import moment from 'moment';
-import {EVENTS} from '../mock/card.js';
 
-const formatTime = (date) => {
+export const EVENTS = {
+  TRANSFER: [`bus`, `drive`, `flight`, `ship`, `taxi`, `train`, `transport`],
+  ACTIVITY: [`check-in`, `restaurant`, `sightseeing`]
+};
+
+export const formatTime = (date) => {
   return moment(date).format(`HH:mm`);
 };
 
-const formatDate = (date) => {
+export const formatDate = (date) => {
   return moment(date).format(`DD-MM-YY`);
 };
 
-const formateDateAndTime = (date) => {
+export const formateDateAndTime = (date) => {
   return moment(date).format(`DD/MM/YY HH:mm`);
 };
 
-const formatDateForDatetime = (date) => {
+export const formatDateForDatetime = (date) => {
   return moment(date, moment.HTML5_FMT.DATETIME_LOCAL);
 };
 
-const getEventDuration = (endDate, startDate) => {
+export const getEventDuration = (endDate, startDate) => {
   const a = moment(endDate);
   const b = moment(startDate);
 
@@ -28,15 +32,15 @@ const getEventDuration = (endDate, startDate) => {
   return `${days} ${hours} ${minutes}`;
 };
 
-const getMonth = (date) => {
+export const getMonth = (date) => {
   return moment(date).format(`MMM`);
 };
 
-const uppercaseFirstLetter = (element) => {
+export const uppercaseFirstLetter = (element) => {
   return element[0].toUpperCase() + element.slice(1);
 };
 
-const getEventTitle = (type) => {
+export const getEventTitle = (type) => {
   let eventTitle;
   if (EVENTS.ACTIVITY.indexOf(type) !== -1) {
     eventTitle = uppercaseFirstLetter(type) + ` in `;
@@ -47,6 +51,3 @@ const getEventTitle = (type) => {
   }
   return eventTitle;
 };
-
-export {getMonth, formatTime, formatDate, formateDateAndTime, formatDateForDatetime, getEventDuration, uppercaseFirstLetter, getEventTitle};
-

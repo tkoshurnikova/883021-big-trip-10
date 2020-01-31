@@ -1,4 +1,4 @@
-import {EVENTS, DESTINATIONS, OFFERS} from '../mock/card.js';
+import {EVENTS} from '../utils/common.js';
 import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {Mode as PointControllerMode} from '../controllers/point.js';
@@ -25,17 +25,17 @@ const createEventsFieldsetMarkup = (group, type) => {
   );
 };
 
-const createOfferMarkup = (offer, offers) => {
+const createOfferMarkup = (offer, offers, type, index) => {
   const isChecked = offers.findIndex((item) => {
-    return item.name === offer.name;
+    return item.title === offer.title;
   });
   const check = (isChecked === -1) ? `` : `checked`;
 
   return (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${check}>
-      <label class="event__offer-label" for="event-offer-${offer.type}-1">
-        <span class="event__offer-title">${offer.name}</span>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-${index}" type="checkbox" name="event-offer-${type}" ${check}>
+      <label class="event__offer-label" for="event-offer-${type}-${index}">
+        <span class="event__offer-title">${offer.title}</span>
         &plus;
         &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
       </label>
@@ -43,12 +43,14 @@ const createOfferMarkup = (offer, offers) => {
   );
 };
 
-const createCardEditTemplate = (card, options = {}, mode) => {
+const createCardEditTemplate = (card, options = {}, mode, destinations, allOffers) => {
   const {photos, description} = card;
   const {type, destination, startDate, endDate, price, offers, isFavorite} = options;
   const eventGroups = Object.keys(EVENTS);
   const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group], type)).join(`\n`);
-  const offersMarkup = OFFERS.map((offer) => createOfferMarkup(offer, offers)).join(`\n`);
+  const offersByType = allOffers.getOffers().filter((item) => item.type === type).map((item) => item.offers);
+  const offersMarkup = offersByType.map((offersArray) => offersArray.map((offer, index) => createOfferMarkup(offer, offers, type, index)).join(`\n`));
+
   const isChecked = isFavorite ? `checked` : ``;
 
   return (
@@ -72,9 +74,9 @@ const createCardEditTemplate = (card, options = {}, mode) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1" required>
           <datalist id="destination-list-1">
-    ${DESTINATIONS.map((item) => {
+    ${destinations.getDestinationNames().map((item) => {
       return (
-        `<option value="${item.city}"></option>`
+        `<option value="${item}"></option>`
       );
     }).join(`\n`)}
           </datalist>
@@ -140,7 +142,7 @@ const createCardEditTemplate = (card, options = {}, mode) => {
             <div class="event__photos-tape">
     ${photos.map((photo) => {
       return (
-        `<img class="event__photo" src="${photo}" alt="Event photo">`
+        `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`
       );
     }).join(`\n`)}
             </div>
@@ -152,12 +154,13 @@ const createCardEditTemplate = (card, options = {}, mode) => {
   );
 };
 
-
 export default class CardEdit extends AbstractSmartComponent {
-  constructor(card, mode) {
+  constructor(card, mode, destinations, offers) {
     super();
     this._card = card;
     this._mode = mode;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._cardType = card.type;
     this._cardDestination = card.destination;
@@ -187,7 +190,7 @@ export default class CardEdit extends AbstractSmartComponent {
       price: this._cardPrice,
       offers: this._cardOffers,
       isFavorite: this._cardIsFavorite
-    }, this._mode);
+    }, this._mode, this._destinations, this._offers);
   }
 
   removeElement() {
@@ -322,8 +325,8 @@ export default class CardEdit extends AbstractSmartComponent {
     });
 
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
-      DESTINATIONS.forEach((destination) => {
-        if (evt.target.value === destination.city) {
+      this._destinations.getDestinations().forEach((destination) => {
+        if (evt.target.value === destination.name) {
           this._cardDestination = evt.target.value;
           this._card.description = destination.description;
           this.rerender();

@@ -1,5 +1,5 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {EVENTS} from '../mock/card.js';
+import {EVENTS} from '../utils/common.js';
 
 import moment from 'moment';
 import Chart from 'chart.js';

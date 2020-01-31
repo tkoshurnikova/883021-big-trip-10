@@ -8,9 +8,11 @@ import PointController, {Mode as PointControllerMode, EmptyCard} from './point.j
 import {render, RenderPosition} from '../utils/render.js';
 
 export default class TripController {
-  constructor(container, cardsModel) {
+  constructor(container, cardsModel, destinations, offers) {
     this._container = container;
     this._cardsModel = cardsModel;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._creatingCard = null;
 
@@ -73,7 +75,7 @@ export default class TripController {
         sortedCardsByDate
         .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
         .forEach((card) => {
-          const pointController = new PointController(day, this._onDataChange, this._onViewChange);
+          const pointController = new PointController(day, this._onDataChange, this._onViewChange, this._destinations, this._offers);
           pointController.render(card, PointControllerMode.DEFAULT);
           pointControllers.push(pointController);
         });
@@ -98,7 +100,7 @@ export default class TripController {
       return;
     }
     const cardsListElement = this._cardsListComponent;
-    this._creatingCard = new PointController(cardsListElement, this._onDataChange, this._onViewChange);
+    this._creatingCard = new PointController(cardsListElement, this._onDataChange, this._onViewChange, this._destinations, this._offers);
     this._creatingCard.render(EmptyCard, PointControllerMode.ADDING);
   }
 
@@ -147,7 +149,7 @@ export default class TripController {
       const pointControllers = [];
       const renderCardsWithoutDays = () => {
         sortedCards.forEach((card) => {
-          const pointController = new PointController(dayBlockWithoutDate, this._onDataChange, this._onViewChange);
+          const pointController = new PointController(dayBlockWithoutDate, this._onDataChange, this._onViewChange, this._destinations, this._offers);
           pointController.render(card, PointControllerMode.DEFAULT);
           pointControllers.push(pointController);
         });

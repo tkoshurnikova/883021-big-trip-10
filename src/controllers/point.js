@@ -21,10 +21,13 @@ export const EmptyCard = {
 };
 
 export default class PointController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, destinations, offers) {
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._destinations = destinations;
+    this._offers = offers;
+
     this._cardComponent = null;
     this._cardEditComponent = null;
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
@@ -60,7 +63,7 @@ export default class PointController {
           remove(oldCardComponent);
           remove(oldCardEditComponent);
         }
-        this._cardEditComponent = new CardEditComponent(this._card, Mode.ADDING);
+        this._cardEditComponent = new CardEditComponent(this._card, Mode.ADDING, this._destinations, this._offers);
         document.addEventListener(`keydown`, this._onEscKeyDown);
         render(container, this._cardEditComponent, RenderPosition.AFTERBEGIN);
         this._setEditCardListeners();
@@ -84,7 +87,7 @@ export default class PointController {
 
   _replaceCardToEdit() {
     this._onViewChange();
-    this._cardEditComponent = new CardEditComponent(this._card);
+    this._cardEditComponent = new CardEditComponent(this._card, Mode.EDIT, this._destinations, this._offers);
     replace(this._cardEditComponent, this._cardComponent);
     this._mode = Mode.EDIT;
     this._setEditCardListeners();
