@@ -6,6 +6,11 @@ import CardModel from '../models/card.js';
 import flatpickr from 'flatpickr';
 import moment from 'moment';
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtontext: `Save`
+};
+
 const createEventTypeMarkup = (event, type) => {
   const isChecked = (type === event) ? `checked` : ``;
 
@@ -46,12 +51,13 @@ const createOfferMarkup = (offer, offers, type, index) => {
 
 const createCardEditTemplate = (card, options = {}, mode, destinations, allOffers) => {
   const {photos, description} = card;
-  const {type, destination, startDate, endDate, price, offers, isFavorite} = options;
+  const {type, destination, startDate, endDate, price, offers, isFavorite, externalData} = options;
   const eventGroups = Object.keys(EVENTS);
   const events = eventGroups.map((group) => createEventsFieldsetMarkup(EVENTS[group], type)).join(`\n`);
   const offersByType = allOffers.getOffers().filter((item) => item.type === type).map((item) => item.offers);
   const offersMarkup = offersByType.map((offersArray) => offersArray.map((offer, index) => createOfferMarkup(offer, offers, type, index)).join(`\n`));
-
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtontext = externalData.saveButtontext;
   const isChecked = isFavorite ? `checked` : ``;
 
   return (
@@ -103,8 +109,8 @@ const createCardEditTemplate = (card, options = {}, mode, destinations, allOffer
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" required>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtontext}</button>
+        <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
 
         ${mode === PointControllerMode.ADDING ? `` :
 
@@ -170,6 +176,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._cardPrice = card.price;
     this._cardStartDate = card.startDate;
     this._cardEndDate = card.endDate;
+    this._externalData = DefaultData;
 
     this._flatpickr = null;
     this._applyFlatpickr();
@@ -190,7 +197,8 @@ export default class CardEdit extends AbstractSmartComponent {
       endDate: this._cardEndDate,
       price: this._cardPrice,
       offers: this._cardOffers,
-      isFavorite: this._cardIsFavorite
+      isFavorite: this._cardIsFavorite,
+      externalData: this._externalData
     }, this._mode, this._destinations, this._offers);
   }
 
@@ -232,6 +240,11 @@ export default class CardEdit extends AbstractSmartComponent {
       'offers': offersChecked,
       'is_favorite': form.querySelector(`.event__favorite-checkbox`) ? form.querySelector(`.event__favorite-checkbox`).checked : false
     });
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
   }
 
   setRollUpButtonClickHandler(handler) {

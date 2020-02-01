@@ -27,8 +27,26 @@ const API = class {
       .then(Card.parseCards);
   }
 
-  // createCard(card) {
-  // }
+  getDestinations() {
+    return this._load({url: `destinations`})
+    .then((response) => response.json());
+  }
+
+  getOffers() {
+    return this._load({url: `offers`})
+    .then((response) => response.json());
+  }
+
+  createCard(card) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(card.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json())
+      .then(Card.parseCard);
+  }
 
   updateCard(id, data) {
     return this._load({
@@ -41,17 +59,11 @@ const API = class {
       .then(Card.parseCard);
   }
 
-  // deleteCard(id) {
-  // }
-
-  getDestinations() {
-    return this._load({url: `destinations`})
-    .then((response) => response.json());
-  }
-
-  getOffers() {
-    return this._load({url: `offers`})
-    .then((response) => response.json());
+  deleteCard(id) {
+    return this._load({
+      url: `points/${id}`,
+      method: Method.DELETE
+    });
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

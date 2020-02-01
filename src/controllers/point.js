@@ -3,6 +3,8 @@ import CardEditComponent from '../components/card-edit.js';
 import CardModel from '../models/card.js';
 import {render, replace, remove, RenderPosition} from '../utils/render.js';
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`,
@@ -86,6 +88,21 @@ export default class PointController {
     }
   }
 
+  shake() {
+    this._cardEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._cardComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._cardEditComponent.getElement().style.animation = ``;
+      this._cardComponent.getElement().style.animation = ``;
+
+      this._cardEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
   _replaceCardToEdit() {
     this._onViewChange();
     this._cardEditComponent = new CardEditComponent(this._card, Mode.EDIT, this._destinations, this._offers);
@@ -118,12 +135,23 @@ export default class PointController {
 
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
+
+      this._cardEditComponent.setData({
+        saveButtonText: `Saving...`
+      });
+
       const newData = this._cardEditComponent.getData();
       this._onDataChange(this, this._card, newData);
       this._replaceEditToCard();
     });
 
-    this._cardEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, this._card, null));
+    this._cardEditComponent.setDeleteButtonClickHandler(() => {
+      this._cardEditComponent.setData({
+        deleteButtonText: `Deleting...`
+      });
+
+      this._onDataChange(this, this._card, null);
+    });
   }
 
   _onEscKeyDown(evt) {
