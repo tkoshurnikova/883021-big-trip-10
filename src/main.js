@@ -22,7 +22,7 @@ const siteMenuComponent = new SiteMenuComponent();
 const statsComponent = new StatsComponent(cardsModel);
 const cardsListSection = document.querySelector(`.trip-events`);
 
-const tripContoller = new TripController(cardsListSection, cardsModel, destinationsModel, offersModel);
+const tripContoller = new TripController(cardsListSection, cardsModel, destinationsModel, offersModel, api);
 const filterController = new FilterController(siteHeaderElement, cardsModel);
 
 render(siteHeaderElement, siteMenuComponent, RenderPosition.AFTERBEGIN);

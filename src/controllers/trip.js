@@ -8,11 +8,12 @@ import PointController, {Mode as PointControllerMode, EmptyCard} from './point.j
 import {render, RenderPosition} from '../utils/render.js';
 
 export default class TripController {
-  constructor(container, cardsModel, destinations, offers) {
+  constructor(container, cardsModel, destinations, offers, api) {
     this._container = container;
     this._cardsModel = cardsModel;
     this._destinations = destinations;
     this._offers = offers;
+    this._api = api;
 
     this._creatingCard = null;
 
@@ -174,10 +175,15 @@ export default class TripController {
       this._cardsModel.removeCard(oldData.id);
       this._updateCards();
     } else {
-      const isSuccess = this._cardsModel.updateCard(oldData.id, newData);
-      if (isSuccess) {
-        pointController.render(newData, PointControllerMode.DEFAULT);
-      }
+      this._api.updateCard(oldData.id, newData)
+      .then((cardModel) => {
+        const isSuccess = this._cardsModel.updateCard(oldData.id, cardModel);
+
+        if (isSuccess) {
+          pointController.render(cardModel);
+          this._updateCards();
+        }
+      });
     }
   }
 

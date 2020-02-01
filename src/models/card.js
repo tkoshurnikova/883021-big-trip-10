@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export default class Card {
   constructor(data) {
     this.id = data[`id`];
@@ -16,11 +18,15 @@ export default class Card {
     return {
       'id': this.id,
       'base_price': this.price,
-      'date_from': this.startDate.toISOString(),
-      'date_to': this.endDate.toISOString(),
-      // 'destination':,
+      'date_from': moment(this.startDate).toISOString(),
+      'date_to': moment(this.endDate).toISOString(),
+      'destination': {
+        'description': this.description,
+        'name': this.destination,
+        'pictures': this.photos
+      },
       'is_favorite': this.isFavorite,
-      // 'offers': ,
+      'offers': this.offers,
       'type': this.type
     };
   }

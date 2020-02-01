@@ -1,5 +1,6 @@
 import CardComponent from '../components/card.js';
 import CardEditComponent from '../components/card-edit.js';
+import CardModel from '../models/card.js';
 import {render, replace, remove, RenderPosition} from '../utils/render.js';
 
 export const Mode = {
@@ -109,16 +110,16 @@ export default class PointController {
       });
 
       this._cardEditComponent.setFavoriteButtonClickHandler(() => {
-        this._onDataChange(this, this._card, Object.assign({}, this._card, {
-          isFavorite: !this._card.isFavorite
-        }));
+        const newCard = CardModel.clone(this._card);
+        newCard.isFavorite = !newCard.isFavorite;
+        this._onDataChange(this, this._card, newCard);
       });
     }
 
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._cardEditComponent.getData();
-      this._onDataChange(this, this._card, data);
+      const newData = this._cardEditComponent.getData();
+      this._onDataChange(this, this._card, newData);
       this._replaceEditToCard();
     });
 

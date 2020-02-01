@@ -2,6 +2,7 @@ import {EVENTS} from '../utils/common.js';
 import {formateDateAndTime, uppercaseFirstLetter, getEventTitle} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {Mode as PointControllerMode} from '../controllers/point.js';
+import CardModel from '../models/card.js';
 import flatpickr from 'flatpickr';
 import moment from 'moment';
 
@@ -205,30 +206,32 @@ export default class CardEdit extends AbstractSmartComponent {
     const form = this.getElement();
     const formData = new FormData(form);
 
-    const photos = Array.from(form.querySelectorAll(`.event__photo`)).map((photo) => {
-      return photo.src;
-    });
-
     const offersChecked = Array.from(form.querySelectorAll(`.event__offer-checkbox`))
       .filter((input) => input.checked)
       .map((input) => {
         return {
-          name: input.parentElement.querySelector(`.event__offer-title`).textContent,
+          title: input.parentElement.querySelector(`.event__offer-title`).textContent,
           price: parseInt(input.parentElement.querySelector(`.event__offer-price`).textContent, 10)
         };
       });
 
-    return {
-      type: formData.get(`event-type`),
-      destination: formData.get(`event-destination`),
-      photos,
+    const destination = {
+      name: formData.get(`event-destination`),
       description: form.querySelector(`.event__destination-description`).textContent,
-      startDate: new Date(moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`)),
-      endDate: new Date(moment(formData.get(`event-end-time`), `DD/MM/YY HH:mm`)),
-      price: parseInt(formData.get(`event-price`), 10),
-      offers: offersChecked,
-      isFavorite: form.querySelector(`.event__favorite-checkbox`) ? form.querySelector(`.event__favorite-checkbox`).checked : false
+      pictures: Array.from(form.querySelectorAll(`.event__photo`)).map((photo) => {
+        return {src: photo.src, description: photo.alt};
+      })
     };
+
+    return new CardModel({
+      'type': formData.get(`event-type`),
+      'destination': destination,
+      'date_from': moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`).valueOf(),
+      'date_to': moment(formData.get(`event-end-time`), `DD/MM/YY HH:mm`).valueOf(),
+      'base_price': parseInt(formData.get(`event-price`), 10),
+      'offers': offersChecked,
+      'is_favorite': form.querySelector(`.event__favorite-checkbox`) ? form.querySelector(`.event__favorite-checkbox`).checked : false
+    });
   }
 
   setRollUpButtonClickHandler(handler) {
