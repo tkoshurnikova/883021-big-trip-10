@@ -8,7 +8,7 @@ import moment from 'moment';
 
 const DefaultData = {
   deleteButtonText: `Delete`,
-  saveButtontext: `Save`
+  saveButtonText: `Save`
 };
 
 const createEventTypeMarkup = (event, type) => {
@@ -57,7 +57,7 @@ const createCardEditTemplate = (card, options = {}, mode, destinations, allOffer
   const offersByType = allOffers.getOffers().filter((item) => item.type === type).map((item) => item.offers);
   const offersMarkup = offersByType.map((offersArray) => offersArray.map((offer, index) => createOfferMarkup(offer, offers, type, index)).join(`\n`));
   const deleteButtonText = externalData.deleteButtonText;
-  const saveButtontext = externalData.saveButtontext;
+  const saveButtonText = externalData.saveButtonText;
   const isChecked = isFavorite ? `checked` : ``;
 
   return (
@@ -109,7 +109,7 @@ const createCardEditTemplate = (card, options = {}, mode, destinations, allOffer
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" required>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtontext}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
         <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
 
         ${mode === PointControllerMode.ADDING ? `` :
@@ -244,6 +244,14 @@ export default class CardEdit extends AbstractSmartComponent {
 
   setData(data) {
     this._externalData = Object.assign({}, DefaultData, data);
+    this._cardOffers = Array.from(document.querySelectorAll(`.event__offer-checkbox`))
+      .filter((input) => input.checked)
+      .map((input) => {
+        return {
+          title: input.parentElement.querySelector(`.event__offer-title`).textContent,
+          price: parseInt(input.parentElement.querySelector(`.event__offer-price`).textContent, 10)
+        };
+      });
     this.rerender();
   }
 

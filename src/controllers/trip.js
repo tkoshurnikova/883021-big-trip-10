@@ -189,8 +189,7 @@ export default class TripController {
         const isSuccess = this._cardsModel.updateCard(oldData.id, cardModel);
 
         if (isSuccess) {
-          pointController.render(cardModel);
-          this._updateCards();
+          pointController.render(cardModel, PointControllerMode.DEFAULT);
         }
       })
       .catch(() => {
