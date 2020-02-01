@@ -1,6 +1,6 @@
 import FilterComponent from '../components/filter.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
-import {FilterType} from '../utils/filter.js';
+import {FilterType, getCardsByFilter} from '../utils/filter.js';
 
 export default class FilterController {
   constructor(container, cardsModel) {
@@ -11,15 +11,18 @@ export default class FilterController {
     this._filterComponent = null;
 
     this._onFilterChange = this._onFilterChange.bind(this);
+    this._onDataChange = this._onDataChange.bind(this);
+
+    this._cardsModel.setOnDataChange(this._onDataChange);
   }
 
   render() {
     const container = this._container;
-    // const allCards = this._cardsModel.getCardsAll();
     const oldComponent = this._filterComponent;
     const filters = Object.values(FilterType).map((filterType) => {
       return {
-        title: filterType
+        title: filterType,
+        isDisabled: getCardsByFilter(this._cardsModel.getCards(), filterType).length === 0 ? true : false
       };
     });
 
@@ -36,5 +39,9 @@ export default class FilterController {
   _onFilterChange(filterType) {
     this._cardsModel.setFilter(filterType);
     this._activeFilterType = filterType;
+  }
+
+  _onDataChange() {
+    this.render();
   }
 }

@@ -244,14 +244,6 @@ export default class CardEdit extends AbstractSmartComponent {
 
   setData(data) {
     this._externalData = Object.assign({}, DefaultData, data);
-    this._cardOffers = Array.from(document.querySelectorAll(`.event__offer-checkbox`))
-      .filter((input) => input.checked)
-      .map((input) => {
-        return {
-          title: input.parentElement.querySelector(`.event__offer-title`).textContent,
-          price: parseInt(input.parentElement.querySelector(`.event__offer-price`).textContent, 10)
-        };
-      });
     this.rerender();
   }
 
@@ -284,6 +276,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this.setRollUpButtonClickHandler(this._rollUpButtonClickHandler);
     this.setSubmitHandler(this._submitHandler);
     this.setFavoriteButtonClickHandler(this._favoriteButtonClickHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -347,6 +340,19 @@ export default class CardEdit extends AbstractSmartComponent {
       this._cardEndDate = evt.target.value;
       this.rerender();
     });
+
+    if (this._mode !== PointControllerMode.ADDING) {
+      element.querySelector(`.event__available-offers`).addEventListener(`change`, () => {
+        this._cardOffers = Array.from(element.querySelectorAll(`.event__offer-checkbox`))
+        .filter((input) => input.checked)
+        .map((input) => {
+          return {
+            title: input.parentElement.querySelector(`.event__offer-title`).textContent,
+            price: parseInt(input.parentElement.querySelector(`.event__offer-price`).textContent, 10)
+          };
+        });
+      });
+    }
 
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
       this._destinations.getDestinations().forEach((destination) => {

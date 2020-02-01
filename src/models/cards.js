@@ -58,6 +58,10 @@ export default class Cards {
     this._filterChangeHandlers.push(handler);
   }
 
+  setOnDataChange(handler) {
+    this._dataChangeHandlers.push(handler);
+  }
+
   _callHandlers(handlers) {
     handlers.forEach((handler) => handler());
   }
