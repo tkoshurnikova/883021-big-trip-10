@@ -8,9 +8,12 @@ import PointController, {Mode as PointControllerMode, EmptyCard} from './point.j
 import {render, RenderPosition} from '../utils/render.js';
 
 export default class TripController {
-  constructor(container, cardsModel) {
+  constructor(container, cardsModel, destinations, offers, api) {
     this._container = container;
     this._cardsModel = cardsModel;
+    this._destinations = destinations;
+    this._offers = offers;
+    this._api = api;
 
     this._creatingCard = null;
 
@@ -73,7 +76,7 @@ export default class TripController {
         sortedCardsByDate
         .filter((card) => card.startDate.getDate() === new Date(uniqueDate).getDate())
         .forEach((card) => {
-          const pointController = new PointController(day, this._onDataChange, this._onViewChange);
+          const pointController = new PointController(day, this._onDataChange, this._onViewChange, this._destinations, this._offers);
           pointController.render(card, PointControllerMode.DEFAULT);
           pointControllers.push(pointController);
         });
@@ -98,7 +101,7 @@ export default class TripController {
       return;
     }
     const cardsListElement = this._cardsListComponent;
-    this._creatingCard = new PointController(cardsListElement, this._onDataChange, this._onViewChange);
+    this._creatingCard = new PointController(cardsListElement, this._onDataChange, this._onViewChange, this._destinations, this._offers);
     this._creatingCard.render(EmptyCard, PointControllerMode.ADDING);
   }
 
@@ -147,7 +150,7 @@ export default class TripController {
       const pointControllers = [];
       const renderCardsWithoutDays = () => {
         sortedCards.forEach((card) => {
-          const pointController = new PointController(dayBlockWithoutDate, this._onDataChange, this._onViewChange);
+          const pointController = new PointController(dayBlockWithoutDate, this._onDataChange, this._onViewChange, this._destinations, this._offers);
           pointController.render(card, PointControllerMode.DEFAULT);
           pointControllers.push(pointController);
         });
@@ -164,18 +167,34 @@ export default class TripController {
         pointController.destroy();
         this._updateCards();
       } else {
-        this._cardsModel.addCard(newData);
-        pointController.render(newData, PointControllerMode.DEFAULT);
-        this._pointControllers = [].concat(pointController, this._pointControllers);
+        this._api.createCard(newData)
+          .then((cardModel) => {
+            this._cardsModel.addCard(cardModel);
+            pointController.render(cardModel, PointControllerMode.DEFAULT);
+            this._pointControllers = [].concat(pointController, this._pointControllers);
+          });
       }
     } else if (newData === null) {
-      this._cardsModel.removeCard(oldData.id);
-      this._updateCards();
+      this._api.deleteCard(oldData.id)
+        .then(() => {
+          this._cardsModel.removeCard(oldData.id);
+          this._updateCards();
+        })
+        .catch(() => {
+          pointController.shake();
+        });
     } else {
-      const isSuccess = this._cardsModel.updateCard(oldData.id, newData);
-      if (isSuccess) {
-        pointController.render(newData, PointControllerMode.DEFAULT);
-      }
+      this._api.updateCard(oldData.id, newData)
+      .then((cardModel) => {
+        const isSuccess = this._cardsModel.updateCard(oldData.id, cardModel);
+
+        if (isSuccess) {
+          pointController.render(cardModel, PointControllerMode.DEFAULT);
+        }
+      })
+      .catch(() => {
+        pointController.shake();
+      });
     }
   }
 
