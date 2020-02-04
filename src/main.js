@@ -6,9 +6,10 @@ import StatsComponent from './components/stats.js';
 import TripController from './controllers/trip.js';
 import DestinationsModel from './models/destinations.js';
 import OffersModel from './models/offers.js';
-import {render, RenderPosition} from './utils/render.js';
+import LoadingComponent from './components/loading.js';
+import {render, remove, RenderPosition} from './utils/render.js';
 
-const AUTHORIZATION = `Basic exIHB6SXOwYQ147`;
+const AUTHORIZATION = `Basic exIHB6SXOwYQ147s`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 
 const api = new API(END_POINT, AUTHORIZATION);
@@ -21,10 +22,12 @@ const siteHeaderElement = document.querySelector(`.trip-main__trip-controls`);
 const siteMenuComponent = new SiteMenuComponent();
 const statsComponent = new StatsComponent(cardsModel);
 const cardsListSection = document.querySelector(`.trip-events`);
+const loadingComponent = new LoadingComponent();
 
 const tripContoller = new TripController(cardsListSection, cardsModel, destinationsModel, offersModel, api);
 const filterController = new FilterController(siteHeaderElement, cardsModel);
 
+render(cardsListSection, loadingComponent, RenderPosition.BEFOREEND);
 render(siteHeaderElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
 filterController.render();
 
@@ -48,12 +51,6 @@ siteMenuComponent.setOnChange((menuItem) => {
   }
 });
 
-api.getCards()
-  .then((cards) => {
-    cardsModel.setCards(cards);
-    tripContoller.render();
-  });
-
 api.getDestinations()
   .then((destinations) => {
     destinationsModel.setDestinations(destinations);
@@ -63,3 +60,10 @@ api.getOffers()
   .then((offers) => {
     offersModel.setOffers(offers);
   });
+
+api.getCards()
+.then((cards) => {
+  cardsModel.setCards(cards);
+  remove(loadingComponent);
+  tripContoller.render();
+});

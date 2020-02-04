@@ -30,12 +30,13 @@ const createTripInfoTemplate = (cards) => {
     return sum + current;
   });
   const route = getRouteInfo(cards);
+  const endMonth = (getMonth(cards[0].startDate) === getMonth(cards[cards.length - 1].endDate)) ? `` : getMonth(cards[cards.length - 1].endDate);
 
   return (
     `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
         <h1 class="trip-info__title">${route}</h1>
-        <p class="trip-info__dates">${getMonth(cards[0].startDate)} ${cards[0].startDate.getDate()}&nbsp;&mdash;&nbsp;${cards[cards.length - 1].endDate.getDate()}</p>
+        <p class="trip-info__dates">${getMonth(cards[0].startDate)} ${cards[0].startDate.getDate()}&nbsp;&mdash;&nbsp;${endMonth} ${cards[cards.length - 1].endDate.getDate()}</p>
       </div>
       <p class="trip-info__cost">
         Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalCost}</span>

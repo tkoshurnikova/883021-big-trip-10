@@ -285,27 +285,43 @@ export default class CardEdit extends AbstractSmartComponent {
     this._applyFlatpickr();
   }
 
+  blockElement() {
+    const form = this.getElement();
+    form.classList.add(`event--disabled`);
+    form.querySelectorAll(`input`).forEach((input) => (input.disabled = true));
+    form.querySelectorAll(`button`).forEach((button) => (button.disabled = true));
+  }
+
   _applyFlatpickr() {
+
     if (this._flatpickr) {
       this._flatpickr.destroy();
       this._flatpickr = null;
     }
 
     const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
-    this._setFlatpickr(startDateElement, this._cardStartDate, new Date().fp_incr(-14), this._cardEndDate);
+    this._setFlatpickrForStartDate(startDateElement, this._cardStartDate);
 
     const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
-    this._setFlatpickr(endDateElement, this._cardEndDate, this._cardStartDate, new Date().fp_incr(14));
+    this._setFlatpickrForEndDate(endDateElement, this._cardEndDate, this._cardStartDate);
   }
 
-  _setFlatpickr(input, defaultDate, minDate, maxDate) {
+  _setFlatpickrForStartDate(input, defaultDate) {
+    this._flatpickr = flatpickr(input, {
+      enableTime: true,
+      dateFormat: `d/m/y H:i`,
+      allowInput: true,
+      defaultDate,
+    });
+  }
+
+  _setFlatpickrForEndDate(input, defaultDate, minDate) {
     this._flatpickr = flatpickr(input, {
       enableTime: true,
       dateFormat: `d/m/y H:i`,
       allowInput: true,
       defaultDate,
       minDate,
-      maxDate,
     });
   }
 

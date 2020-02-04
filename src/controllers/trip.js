@@ -21,6 +21,8 @@ export default class TripController {
     this._cardsListComponent = new CardsListComponent();
     this._noCardsComponent = new NoCardsComponent();
 
+    this._activeSortType = SortType.EVENT;
+
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
@@ -117,6 +119,8 @@ export default class TripController {
   }
 
   _onSortTypeChange(sortType) {
+    this._activeSortType = sortType;
+
     let sortedCards = [];
     const cards = this._cardsModel.getCards();
 
@@ -167,23 +171,28 @@ export default class TripController {
         pointController.destroy();
         this._updateCards();
       } else {
+        pointController.blockOnSave();
         this._api.createCard(newData)
           .then((cardModel) => {
             this._cardsModel.addCard(cardModel);
             pointController.render(cardModel, PointControllerMode.DEFAULT);
             this._pointControllers = [].concat(pointController, this._pointControllers);
+            this._onSortTypeChange(this._sortComponent.getCurrentSortType());
           });
       }
     } else if (newData === null) {
+      pointController.blockOnSave();
       this._api.deleteCard(oldData.id)
         .then(() => {
           this._cardsModel.removeCard(oldData.id);
           this._updateCards();
+          this._onSortTypeChange(this._sortComponent.getCurrentSortType());
         })
         .catch(() => {
           pointController.shake();
         });
     } else {
+      pointController.blockOnSave();
       this._api.updateCard(oldData.id, newData)
       .then((cardModel) => {
         const isSuccess = this._cardsModel.updateCard(oldData.id, cardModel);
@@ -191,6 +200,8 @@ export default class TripController {
         if (isSuccess) {
           pointController.render(cardModel, PointControllerMode.DEFAULT);
         }
+
+        this._onSortTypeChange(this._sortComponent.getCurrentSortType());
       })
       .catch(() => {
         pointController.shake();

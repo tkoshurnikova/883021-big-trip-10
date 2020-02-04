@@ -103,6 +103,10 @@ export default class PointController {
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
+  blockOnSave() {
+    this._cardEditComponent.blockElement();
+  }
+
   _replaceCardToEdit() {
     this._onViewChange();
     this._cardEditComponent = new CardEditComponent(this._card, Mode.EDIT, this._destinations, this._offers);

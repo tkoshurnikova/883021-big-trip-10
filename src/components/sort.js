@@ -68,4 +68,8 @@ export default class Sort extends AbstractComponent {
       handler(this._currentSortType);
     });
   }
+
+  getCurrentSortType() {
+    return this._currentSortType;
+  }
 }

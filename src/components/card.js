@@ -2,9 +2,10 @@ import {formatTime, formatDateForDatetime, getEventDuration, getEventTitle} from
 import AbstractComponent from './abstract-component.js';
 
 const createOffersMarkup = (offers) => {
+  const MAX_OFFERS = 3;
 
-  if (offers.length > 3) {
-    offers = offers.slice(2);
+  if (offers.length > MAX_OFFERS) {
+    offers = offers.slice(MAX_OFFERS - 1);
   }
 
   return offers
